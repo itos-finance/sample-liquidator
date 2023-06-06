@@ -1,0 +1,3 @@
+[submodule "LiqContract/lib/forge-std"]
+	path = LiqContract/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
