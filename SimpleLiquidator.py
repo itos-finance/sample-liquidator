@@ -27,8 +27,9 @@ def liquidate(addr, safeToken):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("contract", type=Web3.to_checksum_address, help="Address of the PM contract")
+    parser.add_argument("pm_contract", type=Web3.to_checksum_address, help="Address of the PM contract")
     parser.add_argument("resolver", type=Web3.to_checksum_address, help="Address of the resolver contract")
+    parser.add_argument("pocketbook", type=Web3.to_checksum_address, help="Address of the pocketbook contract")
     parser.add_argument("-p", "--port", default=4321, help="Port for flask")
     return parser.parse_args()
 
@@ -39,9 +40,10 @@ def main(args):
     global LIQUIDATOR
     getter_abi = get_abi("./abis/GetterFacet.json")
     pm_abi = get_abi("./abis/PositionManagerFacet.json")
+    pocketbook_abi = get_abi("./abis/PocketBook.json")
     account = os.getenv('DEPLOYER_PUBLIC_KEY')
     #setup.makeUnhealthy(positionId, account)
-    LIQUIDATOR = Liquidator(getter_abi, pm_abi, args.contract, args.resolver)
+    LIQUIDATOR = Liquidator(getter_abi, pm_abi, pocketbook_abi, args.pm_contract, args.resolver, args.pocketbook)
     app.run(host="localhost", port=args.port)
 
 

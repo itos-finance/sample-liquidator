@@ -8,16 +8,23 @@ class Liquidator:
     #X128 val used in calculation
     BASEX128 = 1 << 128
 
-    def __init__(self, pm_contract_getter_abi, pm_contract_pm_abi, pm_contract_address, resolver_address,):
+    def __init__(
+            self,
+            pm_contract_getter_abi,
+            pm_contract_pm_abi,
+            pocketbook_contract_abi,
+            pm_contract_address,
+            resolver_address,
+            pocketbook_address
+        ):
         provider = get_provider()
-        self.pm_contract_getter_abi = pm_contract_getter_abi
-        self.pm_contract_pm_abi = pm_contract_pm_abi
-        self.pm_contract_address = pm_contract_address
+
         self.resolver_address = resolver_address
         # get the position manager contract facets. We need a separate contract object per facet since they have
         # unique abis:
-        self.pm_getter_contract = provider.eth.contract(address=self.pm_contract_address, abi=self.pm_contract_getter_abi)
-        self.pm_contract = provider.eth.contract(address=self.pm_contract_address, abi=self.pm_contract_pm_abi)
+        self.pm_getter_contract = provider.eth.contract(address = pm_contract_address, abi = pm_contract_getter_abi)
+        self.pm_contract = provider.eth.contract(address = pm_contract_address, abi = pm_contract_pm_abi)
+        self.pocketbook_contract = provider.eth.contract(address = pocketbook_address, abi = pocketbook_contract_abi)
 
         # get the util values from getter facet and set them:
         self.maxUtil = self.pm_getter_contract.functions.maxUtil().call()
@@ -54,7 +61,7 @@ class Liquidator:
                 print("     found portfolio to liquidate: ", id)
 
                 # how do we liquidate?
-                instructions = self.getInstructions(id, collateral, debt, self.liqToken)
+                instructions = self.getInstructions(i, collateral, debt, self.liqToken)
 
                 # get list of positions to liquidate
                 positions = self.pm_getter_contract.functions.getPortfolio(account, id).call()
@@ -69,10 +76,12 @@ class Liquidator:
 
     def getInstructions(self, id, collateral, debt, tokenOut):
         # get the tokens and amounts in the portfolio:
-        (_, assetId, _, _ ) = self.pm_getter_contract.functions.getPosition(id)
-        (_, _, tokens, amounts) = self.pocketbook_contract.functions.queryValue(assetId)
-        print(tokens)
-        print(amounts)
+        (source, pos_type, assetId, sourceAddress, owner) = self.pm_getter_contract.functions.getPosition(id).call()
+        (source, sourceAddress, tokens, credits, debts, deltas) = self.pocketbook_contract.functions.queryValue(assetId).call()
+        print("tokens: ", tokens)
+        print("deltas: ", deltas)
+        print("credits: ", credits)
+        print("debts: ", debts)
 
         #how much do we need to liquidate?
         valueToLiquidate = self.calcCreditAndDebtTargets(debt, collateral)
