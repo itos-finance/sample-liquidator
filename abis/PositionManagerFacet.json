@@ -1,516 +1,577 @@
 [
-    {
-      "inputs": [],
-      "name": "InputLengthMismatch",
-      "type": "error"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "InsufficientSplit",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidPortfolio",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidPortfolioId",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidPositionOwner",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "MaxPositionsExceeded",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "NotEligibleForLiquidation",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "PortfolioUndercollateralized",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "PositionNotFound",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "UndersuppliedLiquidationDebt",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "UnnecessaryCreditCloseDetected",
-      "type": "error"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "portfolioId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256[]",
-          "name": "positionIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "Exit",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint8",
-          "name": "portfolio",
-          "type": "uint8"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "assetId",
-          "type": "uint256"
-        }
-      ],
-      "name": "InstallAsset",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "liquidator",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "portfolioId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256[]",
-          "name": "positionIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "Liquidate",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "position",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "source",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "destination",
-          "type": "uint256"
-        }
-      ],
-      "name": "ReassignPosition",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "liquidator",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "sourceId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "destinationId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256[]",
-          "name": "positionIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "Reassignment",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint8",
-          "name": "portfolio",
-          "type": "uint8"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "SetliqToken",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "positionId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint128",
-          "name": "splitPercent",
-          "type": "uint128"
-        }
-      ],
-      "name": "Split",
-      "type": "event"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "resolver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "positionIds",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "bytes[]",
-          "name": "instructions",
-          "type": "bytes[]"
-        }
-      ],
-      "name": "exit",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "enum PositionSource",
-          "name": "source",
-          "type": "uint8"
-        },
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "assetId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint8",
-          "name": "portfolio",
-          "type": "uint8"
-        }
-      ],
-      "name": "installAsset",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "positionId",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "portfolioId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "resolver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "positionIds",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "bytes[]",
-          "name": "instructions",
-          "type": "bytes[]"
-        }
-      ],
-      "name": "liquidate",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "portfolioId",
-          "type": "uint256"
-        }
-      ],
-      "name": "queryValuesNative",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "enum PositionSource",
-              "name": "source",
-              "type": "uint8"
-            },
-            {
-              "internalType": "address",
-              "name": "sourceAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address[]",
-              "name": "tokens",
-              "type": "address[]"
-            },
-            {
-              "internalType": "int256[]",
-              "name": "amounts",
-              "type": "int256[]"
-            }
-          ],
-          "internalType": "struct Record[]",
-          "name": "",
-          "type": "tuple[]"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "portfolioId",
-          "type": "uint256"
-        }
-      ],
-      "name": "queryValuesUSD",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "aggCollateral",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "aggDebt",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "utilization",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct PortfolioData",
-          "name": "portfolio",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "positionId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint8",
-          "name": "target",
-          "type": "uint8"
-        }
-      ],
-      "name": "reassignPosition",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "portfolioId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint8",
-          "name": "destination",
-          "type": "uint8"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "positionIds",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "reassignment",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint8",
-          "name": "portfolio",
-          "type": "uint8"
-        },
-        {
-          "internalType": "address",
-          "name": "safe",
-          "type": "address"
-        }
-      ],
-      "name": "setliqToken",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "positionId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint8",
-          "name": "target",
-          "type": "uint8"
-        },
-        {
-          "internalType": "uint128",
-          "name": "splitPercent",
-          "type": "uint128"
-        }
-      ],
-      "name": "split",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
+  {
+    "inputs": [],
+    "name": "IncompleteLiquidation",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InputLengthMismatch",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "InsufficientSplit",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPortfolio",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPortfolioId",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPositionClose",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPositionOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MaxPositionsExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotEligibleForLiquidation",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PositionNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TailUndercollateralized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TokenDoesNotExist",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "USDUndercollateralized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UndersuppliedLiquidationDebt",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnnecessaryCreditCloseDetected",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "Exit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "portfolio",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      }
+    ],
+    "name": "InstallAsset",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "liquidator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "Liquidate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "position",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "source",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destination",
+        "type": "uint256"
+      }
+    ],
+    "name": "ReassignPosition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "liquidator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sourceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destinationId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "Reassignment",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "portfolio",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "SetLiquidationToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "splitPercent",
+        "type": "uint128"
+      }
+    ],
+    "name": "Split",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "resolver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "instructions",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "exit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum PositionSource",
+        "name": "source",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum PositionType",
+        "name": "posType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "portfolio",
+        "type": "uint8"
+      }
+    ],
+    "name": "installAsset",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "resolver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "instructions",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "liquidate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      }
+    ],
+    "name": "queryValuesNative",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum PositionSource",
+            "name": "source",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "sourceAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "tokens",
+            "type": "address[]"
+          },
+          {
+            "internalType": "int256[]",
+            "name": "amounts",
+            "type": "int256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "deltas",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct Record[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      }
+    ],
+    "name": "queryValuesUSD",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "aggCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "aggDebt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "aggRequirement",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "utilization",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "tails",
+            "type": "address[]"
+          },
+          {
+            "internalType": "int256[]",
+            "name": "tailDebts",
+            "type": "int256[]"
+          },
+          {
+            "internalType": "int256[]",
+            "name": "tailCredits",
+            "type": "int256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "utils",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct PortfolioData",
+        "name": "portfolio",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "target",
+        "type": "uint8"
+      }
+    ],
+    "name": "reassignPosition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "destination",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "reassignment",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "portfolio",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "setLiqToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "target",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint128",
+        "name": "splitPercent",
+        "type": "uint128"
+      }
+    ],
+    "name": "split",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
 ]

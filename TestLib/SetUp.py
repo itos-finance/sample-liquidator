@@ -11,7 +11,7 @@ class SetUp:
         self.provider = get_provider()
         self.pocketbook_address = pocketbook_address
         self.pocketbook_contract = self.provider.eth.contract(address = pocketbook_address, abi = pocketbook_abi)
-        self.mock_pyth_feed = self.provider.eth.contract(address = mock_pyth_address, abi = mock_pyth_abi)
+        #self.mock_pyth_feed = self.provider.eth.contract(address = mock_pyth_address, abi = mock_pyth_abi)
 
     def deposit(self, recipient, portfolio, token, amount):
         #approve the pocketbook to deposit token

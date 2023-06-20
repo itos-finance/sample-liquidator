@@ -10,12 +10,10 @@ from TestLib.SetUp import SetUp
 from dotenv import load_dotenv
 
 from Liquidate import Liquidator
-DEFAULT_CHAIN_URL = 'http://127.0.0.1:8545'
+DEFAULT_CHAIN_URL = 'https://polygon-mumbai.infura.io/v3/e87ed58087a24e5ab2a025a1669bfcad'
 
-POCKETBOOK = Web3.to_checksum_address(0x809d550fca64d94Bd9F66E60752A544199cfAC3D)
-MOCK_PYTH = Web3.to_checksum_address(0x3Aa5ebB10DC797CAC828524e59A333d0A371443c)
-USDC = Web3.to_checksum_address(0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1)
-WETH = Web3.to_checksum_address('0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44')
+USDC = Web3.to_checksum_address('0x5FC8d32690cc91D4c39d9d3abcBD16989F875707')
+WETH = Web3.to_checksum_address('0x0165878A594ca255338adfa4d48449f69242Eb8F')
 
 app = Flask(__name__)
 CORS(app)
@@ -41,11 +39,7 @@ def main(args):
     global LIQUIDATOR
     getter_abi = get_abi("./abis/GetterFacet.json")
     pm_abi = get_abi("./abis/PositionManagerFacet.json")
-    pocketbook_abi = get_abi("./abis/Pocketbook.json")
-    mock_pyth_abi = get_abi("./abis/MockPyth.json")
-    setup = SetUp(POCKETBOOK, MOCK_PYTH, pocketbook_abi, mock_pyth_abi)
     account = os.getenv('DEPLOYER_PUBLIC_KEY')
-    (assetId, positionId) = setup.deposit(account, 0, WETH, 50)
     #setup.makeUnhealthy(positionId, account)
     LIQUIDATOR = Liquidator(getter_abi, pm_abi, args.contract, args.resolver)
     app.run(host="localhost", port=args.port)
