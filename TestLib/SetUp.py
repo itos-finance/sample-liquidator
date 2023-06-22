@@ -1,6 +1,6 @@
 import os
 from ChainListener import get_provider
-from Utils import get_abi
+from lib.Utils import get_abi
 from dotenv import load_dotenv
 from web3 import Web3
 

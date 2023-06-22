@@ -10,6 +10,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "InsufficientRefund",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -413,9 +418,14 @@
             "type": "address[]"
           },
           {
-            "internalType": "int256[]",
-            "name": "amounts",
-            "type": "int256[]"
+            "internalType": "uint256[]",
+            "name": "credits",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "debts",
+            "type": "uint256[]"
           },
           {
             "internalType": "uint256[]",
@@ -445,17 +455,17 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "aggCollateral",
+            "name": "collateralUSD",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "aggDebt",
+            "name": "debtUSD",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "aggRequirement",
+            "name": "obligationUSD",
             "type": "uint256"
           },
           {
@@ -469,14 +479,14 @@
             "type": "address[]"
           },
           {
-            "internalType": "int256[]",
-            "name": "tailDebts",
-            "type": "int256[]"
+            "internalType": "uint256[]",
+            "name": "tailCredits",
+            "type": "uint256[]"
           },
           {
-            "internalType": "int256[]",
-            "name": "tailCredits",
-            "type": "int256[]"
+            "internalType": "uint256[]",
+            "name": "tailDebts",
+            "type": "uint256[]"
           },
           {
             "internalType": "uint256[]",
