@@ -8,6 +8,8 @@ import lib.InstructionsLib as InstructionsLib
 class Liquidator:
     #X128 val used in calculation
     BASEX128 = 1 << 128
+    # when token isn't in the registry, it returns the max uint16 value as an error code
+    NOT_IN_REGISTRY_CODE = 65535
 
     def __init__(
             self,
@@ -33,7 +35,6 @@ class Liquidator:
         self.liqToken = self.pm_getter_contract.functions.fallbackToken().call()
         self.targetUtil = self.pm_getter_contract.functions.targetUtil().call()
         self.liquidationBonus = self.pm_getter_contract.functions.liquidationBonus().call()
-        self.token_registry = self.resolver_contract.functions.getTokenRegistry().call()
 
     #to be called by a function that calls the api to get accounts and discovers one with unhealthy positions
     def liquidate_account(self, account, safeToken):
@@ -91,9 +92,9 @@ class Liquidator:
             if (valueToLiquidate[1] == portfolio_collateral):
                 # liquidate the whole portfolio
                 for tokenIndex in range(0, len(tokens)):
-                    token_in_id = self.get_token_id_from_address(tokens[tokenIndex], 0)
-                    token_out_id = self.get_token_id_from_address(tokenOut, 0)
-                    if token_in_id is None:
+                    token_in_id = self.get_token_id_from_address(tokens[tokenIndex])
+                    token_out_id = self.get_token_id_from_address(tokenOut)
+                    if token_in_id is None or token_out_id is None:
                         raise TokenNotInRegistry()
                     return InstructionsLib.create_itos_swap_instruction(False, token_in_id, token_out_id, 0, credits[tokenIndex], 50)
 
@@ -115,17 +116,9 @@ class Liquidator:
         return (debt_target, credit_target)
 
     # get a the token id given the address of the token and an index to start searching at
-    def get_token_id_from_address(self, token_address, start_idx):
-        for tokId in range(start_idx, len(self.token_registry)):
-            if self.token_registry[tokId] == token_address:
-                return tokId
-        # if not found, refresh the registry and check again:
-        if (start_idx == 0):
-            self.refresh_token_registry()
-            self.get_token_id_from_address(token_address, tokId)
-        else:
+    def get_token_id_from_address(self, token_address):
+        id = self.resolver_contract.functions.get_token_id_from_address(token_address).call()
+        if (id == self.NOT_IN_REGISTRY_CODE):
             return None
-
-    #refresh the registry in case a token was added since the liquidator has been initialized
-    def refresh_token_registry(self):
-        self.token_registry = self.resolver_contract.functions.getTokenRegistry.call()
+        else:
+            return id
