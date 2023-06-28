@@ -6,10 +6,10 @@ import "../lib/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IFlashLoanRec
 import { PositionManagerFacet } from "../lib/itos-position-manager/src/facets/PositionManagerFacet.sol";
 
 struct LiquidationParams {
-        uint256 portfolioId;
-        address resolver;
-        uint256[] calldata positionIds;
-        bytes[] calldata instructions;
+    uint256 portfolioId;
+    address resolver;
+    uint256[] calldata positionIds;
+    bytes[] calldata instructions;
 }
 
 contract Liquidator is IFlashLoanRecipient {
