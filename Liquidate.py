@@ -33,7 +33,7 @@ class Liquidator:
         self.liqToken = self.pm_getter_contract.functions.fallbackToken().call()
         self.targetUtil = self.pm_getter_contract.functions.targetUtil().call()
         self.liquidationBonus = self.pm_getter_contract.functions.liquidationBonus().call()
-        self.token_registry = self.resolver_contract.functions.getTokenRegistry.call()
+        self.token_registry = self.resolver_contract.functions.getTokenRegistry().call()
 
     #to be called by a function that calls the api to get accounts and discovers one with unhealthy positions
     def liquidate_account(self, account, safeToken):
@@ -67,8 +67,11 @@ class Liquidator:
                 # how do we liquidate?
                 instructions = self.getInstructions(portfolio_id, portfolio_collateral, portfolio_debt, self.liqToken, positions)
 
+                pos_to_liq = []
+                for x in range(0, len(positions)):
+                    pos_to_liq.append(Web3.to_int(positions[x]))
                 # call liquidate
-                self.pm_contract.functions.liquidate(portfolio_id, self.resolver_address, positions, instructions).call()
+                self.pm_contract.functions.liquidate(portfolio_id, self.resolver_address, positions, [Web3.to_bytes(0x0),instructions,Web3.to_bytes(0x0),Web3.to_bytes(0x0)]).call()
 
         return "Healthy"
 
