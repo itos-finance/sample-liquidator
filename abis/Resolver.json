@@ -151,6 +151,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "getTokenIdFromAddress",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "id",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getTokenRegistry",
     "outputs": [
@@ -192,11 +211,6 @@
         "internalType": "int256",
         "name": "yDelta",
         "type": "int256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "data",
-        "type": "bytes"
       },
       {
         "internalType": "bytes",
