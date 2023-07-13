@@ -31,7 +31,7 @@ class Liquidator:
 
         # get the static pm config values from getter facet and set them:
         self.maxUtil = self.pm_getter_contract.functions.maxUtil().call()
-        self.liqToken = self.pm_getter_contract.functions.fallbackToken().call()
+        self.liqToken = self.pm_getter_contract.functions.defaultToken().call()
         self.targetUtil = self.pm_getter_contract.functions.targetUtil().call()
         self.liquidationBonus = self.pm_getter_contract.functions.liquidationBonus().call()
 
@@ -73,12 +73,13 @@ class Liquidator:
                 print("     ", positions)
                 # how do we liquidate?
                 close_instructions = self.getInstructions(portfolio_id, portfolio_collateral, portfolio_debt, self.liqToken, positions)
-
+                print("ciLen: ", len(close_instructions))
                 pos_to_liq = []
                 for x in range(0, len(positions)):
                     pos_to_liq.append(Web3.to_int(positions[x]))
                 # call liquidate
-                self.pm_contract.functions.liquidate(portfolio_id, self.resolver_address, positions, [Web3.to_bytes(0x0),close_instructions,Web3.to_bytes(0x0),Web3.to_bytes(0x0)]).call()
+                print("resolver: ", self.resolver_address)
+                self.pm_contract.functions.liquidate(portfolio_id, self.resolver_address, pos_to_liq, [Web3.to_bytes(0x0),close_instructions,close_instructions,Web3.to_bytes(0x0)]).call()
 
         return "Healthy"
 
@@ -103,6 +104,7 @@ class Liquidator:
                     if token_in_id is None or token_out_id is None:
                         raise TokenNotInResolverRegistry()
                     # TODO here we hard-code the tickSpacing to 50. Should make some call to get the tick spacing of given token pair's pool
+                    print("itosswap")
                     return InstructionsLib.create_itos_swap_instruction(False, token_in_id, token_out_id, 0, credits[tokenIndex], 50)
             # TODO: add liquidation if only part of the portfolio needs to be liquidated
         # Temp default return value: a couple NOOPS
