@@ -6,14 +6,9 @@ import argparse
 from web3 import Web3
 import os
 from lib.Utils import get_abi, derive_portfolio_id
-from TestLib.SetUp import SetUp
 from dotenv import load_dotenv
 
 from Liquidate import Liquidator
-DEFAULT_CHAIN_URL = 'https://polygon-mumbai.infura.io/v3/e87ed58087a24e5ab2a025a1669bfcad'
-
-USDC = Web3.to_checksum_address('0x5FC8d32690cc91D4c39d9d3abcBD16989F875707')
-WETH = Web3.to_checksum_address('0x0165878A594ca255338adfa4d48449f69242Eb8F')
 
 app = Flask(__name__)
 CORS(app)

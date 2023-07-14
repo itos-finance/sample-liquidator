@@ -1,7 +1,7 @@
 [
   {
     "inputs": [],
-    "name": "fallbackToken",
+    "name": "defaultToken",
     "outputs": [
       {
         "internalType": "address",
@@ -72,6 +72,19 @@
         "internalType": "struct Position[]",
         "name": "positions",
         "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDefaultVariance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -155,7 +168,26 @@
         "type": "address"
       }
     ],
-    "name": "isLiqTokenEnabled",
+    "name": "getVariance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "producer",
+        "type": "address"
+      }
+    ],
+    "name": "isProducer",
     "outputs": [
       {
         "internalType": "bool",
@@ -174,7 +206,26 @@
         "type": "address"
       }
     ],
-    "name": "isProducer",
+    "name": "isProducerPaused",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "isRefundTokenEnabled",
     "outputs": [
       {
         "internalType": "bool",
@@ -271,32 +322,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "paused",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "priceFeedRegistry",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

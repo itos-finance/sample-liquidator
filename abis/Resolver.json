@@ -1,231 +1,226 @@
 [
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_uniSwapRouter",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_itosRouter",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_itosAMMFactory",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_uniAMMFactory",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_positionManager",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "itosInitCodeHash",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidCallback",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "NotAContract",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ResolutionAlreadyInProgress",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "UnsupportedOpcode",
-      "type": "error"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "addTokenToRegistry",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "tokens",
-          "type": "address[]"
-        }
-      ],
-      "name": "addTokensToRegistry",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "newKing",
-          "type": "address"
-        }
-      ],
-      "name": "changeRegistryAdmin",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "tokens",
-          "type": "address[]"
-        },
-        {
-          "internalType": "int256[]",
-          "name": "amounts",
-          "type": "int256[]"
-        },
-        {
-          "internalType": "address[]",
-          "name": "creditTokens",
-          "type": "address[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "creditTokenAmounts",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "address",
-          "name": "safeToken",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "safeTokenAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes",
-          "name": "instructions",
-          "type": "bytes"
-        }
-      ],
-      "name": "endResolutionCB",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getRegistryAdmin",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "getTokenIdFromAddress",
-      "outputs": [
-        {
-          "internalType": "uint16",
-          "name": "",
-          "type": "uint16"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getTokenRegistry",
-      "outputs": [
-        {
-          "internalType": "address[]",
-          "name": "",
-          "type": "address[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes",
-          "name": "instructions",
-          "type": "bytes"
-        }
-      ],
-      "name": "startResolutionCB",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "int256",
-          "name": "xDelta",
-          "type": "int256"
-        },
-        {
-          "internalType": "int256",
-          "name": "yDelta",
-          "type": "int256"
-        },
-        {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        },
-        {
-          "internalType": "bytes",
-          "name": "instructions",
-          "type": "bytes"
-        }
-      ],
-      "name": "takerCloseSwapCallback",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ]
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_uniSwapRouter",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_itosRouter",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_itosAMMFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_uniAMMFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_positionManager",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "itosInitCodeHash",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidCallback",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotAContract",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ResolutionAlreadyInProgress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnsupportedOpcode",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "addTokenToRegistry",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      }
+    ],
+    "name": "addTokensToRegistry",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newKing",
+        "type": "address"
+      }
+    ],
+    "name": "changeRegistryAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "int256[]",
+        "name": "amounts",
+        "type": "int256[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "creditTokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "creditTokenAmounts",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address",
+        "name": "safeToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "safeTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "instructions",
+        "type": "bytes"
+      }
+    ],
+    "name": "endResolutionCB",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRegistryAdmin",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "getTokenIdFromAddress",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "id",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTokenRegistry",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "instructions",
+        "type": "bytes"
+      }
+    ],
+    "name": "startResolutionCB",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int256",
+        "name": "xDelta",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "yDelta",
+        "type": "int256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "instructions",
+        "type": "bytes"
+      }
+    ],
+    "name": "takerCloseSwapCallback",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
