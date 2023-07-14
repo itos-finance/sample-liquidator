@@ -14,9 +14,9 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/liquidate/<addr>/<safeToken>')
-def liquidate(addr, safeToken):
-    res = LIQUIDATOR.liquidate_account(addr, safeToken)
+@app.route('/liquidate/<addr>')
+def liquidate(addr):
+    res = LIQUIDATOR.liquidate_account(addr)
     return res
 
 
@@ -24,6 +24,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("pm_contract", type=Web3.to_checksum_address, help="Address of the PM contract")
     parser.add_argument("resolver", type=Web3.to_checksum_address, help="Address of the resolver contract")
+    parser.add_argument("liquidator", type=Web3.to_checksum_address, help="Address of the liquidator contract")
     parser.add_argument("-p", "--port", default=4321, help="Port for flask")
     return parser.parse_args()
 
@@ -36,8 +37,9 @@ def main(args):
     pm_abi = get_abi("./abis/PositionManagerFacet.json")
     pocketbook_abi = get_abi("./abis/PocketbookFacet.json")
     resolver_abi = get_abi("./abis/Resolver.json")
+    liquidator_abi = get_abi("./abis/Liquidator.json")
     account = os.getenv('DEPLOYER_PUBLIC_KEY')
-    LIQUIDATOR = Liquidator(getter_abi, pm_abi, pocketbook_abi, resolver_abi, args.pm_contract, args.resolver)
+    LIQUIDATOR = Liquidator(getter_abi, pm_abi, pocketbook_abi, resolver_abi, liquidator_abi, args.pm_contract, args.resolver, args.liquidator)
     app.run(host="localhost", port=args.port)
 
 

@@ -16,8 +16,10 @@ class Liquidator:
             pm_contract_pm_abi,
             pocketbook_contract_abi,
             resolver_contract_abi,
+            liquidator_contract_abi,
             pm_contract_address,
-            resolver_address
+            resolver_address,
+            liquidator_address
         ):
         provider = get_provider()
 
@@ -28,6 +30,7 @@ class Liquidator:
         self.pm_contract = provider.eth.contract(address = pm_contract_address, abi = pm_contract_pm_abi)
         self.pocketbook_contract = provider.eth.contract(address = pm_contract_address, abi = pocketbook_contract_abi)
         self.resolver_contract = provider.eth.contract(address = resolver_address, abi = resolver_contract_abi)
+        self.liquidator_contract = provider.eth.contract(address = liquidator_address, abi = liquidator_contract_abi)
 
         # get the static pm config values from getter facet and set them:
         self.maxUtil = self.pm_getter_contract.functions.maxUtil().call()
@@ -36,7 +39,7 @@ class Liquidator:
         self.liquidationBonus = self.pm_getter_contract.functions.liquidationBonus().call()
 
     #to be called by a function that calls the api to get accounts and discovers one with a liquidate-able portfolio
-    def liquidate_account(self, account, safeToken):
+    def liquidate_account(self, account):
         print("Looking for liquidate-able portfolio on account...")
         portfolios = self.pm_getter_contract.functions.getAllPortfolios(account).call()
         print(portfolios)
@@ -79,7 +82,7 @@ class Liquidator:
                     pos_to_liq.append(Web3.to_int(positions[x]))
                 # call liquidate
                 print("resolver: ", self.resolver_address)
-                self.pm_contract.functions.liquidate(portfolio_id, self.resolver_address, pos_to_liq, [Web3.to_bytes(0x0),close_instructions,close_instructions,Web3.to_bytes(0x0)]).call()
+                self.liquidator_contract.functions.liquidateNoFlashLoan(portfolio_id, self.resolver_address, pos_to_liq, [Web3.to_bytes(0x0),close_instructions,close_instructions,Web3.to_bytes(0x0)]).call()
 
         return "Healthy"
 
