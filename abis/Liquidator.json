@@ -71,6 +71,16 @@
         "type": "address"
       },
       {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      },
+      {
         "internalType": "uint256[]",
         "name": "positionIds",
         "type": "uint256[]"

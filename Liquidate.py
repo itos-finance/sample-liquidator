@@ -82,7 +82,15 @@ class Liquidator:
                     pos_to_liq.append(Web3.to_int(positions[x]))
                 # call liquidate
                 print("resolver: ", self.resolver_address)
-                self.liquidator_contract.functions.liquidateNoFlashLoan(portfolio_id, self.resolver_address, pos_to_liq, [Web3.to_bytes(0x0),close_instructions,close_instructions,Web3.to_bytes(0x0)]).call()
+                # hard code tokens and amounts for now
+                tokens = []
+                tokens.append(Web3.to_checksum_address('0x9A676e781A523b5d0C0e43731313A708CB607508'))
+                tokens.append(Web3.to_checksum_address('0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'))
+                amt = 10000000000000000000
+                amounts = []
+                amounts.append(Web3.to_int(int(str(amt), 32)))
+                amounts.append(Web3.to_int(int(str(amt), 32)))
+                self.liquidator_contract.functions.liquidateNoFlashLoan(portfolio_id, self.resolver_address, tokens, amounts, pos_to_liq, [Web3.to_bytes(0x0),close_instructions,close_instructions,Web3.to_bytes(0x0)]).call()
 
         return "Healthy"
 
