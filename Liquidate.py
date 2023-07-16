@@ -90,7 +90,7 @@ class Liquidator:
                 amounts = []
                 amounts.append(Web3.to_int(int(str(amt), 32)))
                 amounts.append(Web3.to_int(int(str(amt), 32)))
-                self.liquidator_contract.functions.liquidateNoFlashLoan(portfolio_id, self.resolver_address, tokens, amounts, pos_to_liq, [Web3.to_bytes(0x0),close_instructions,close_instructions,Web3.to_bytes(0x0)]).call()
+                self.liquidator_contract.functions.liquidateNoFlashLoan(portfolio_id, self.resolver_address, tokens, amounts, pos_to_liq, [Web3.to_bytes(0x0),Web3.to_bytes(0x0),close_instructions,Web3.to_bytes(0x0)]).call()
 
         return "Healthy"
 
