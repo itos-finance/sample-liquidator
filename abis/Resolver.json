@@ -102,19 +102,14 @@
         "type": "address[]"
       },
       {
-        "internalType": "int256[]",
-        "name": "amounts",
-        "type": "int256[]"
-      },
-      {
         "internalType": "address[]",
-        "name": "creditTokens",
+        "name": "tailTokens",
         "type": "address[]"
       },
       {
-        "internalType": "uint256[]",
-        "name": "creditTokenAmounts",
-        "type": "uint256[]"
+        "internalType": "int256[]",
+        "name": "tailTokenAmounts",
+        "type": "int256[]"
       },
       {
         "internalType": "address",

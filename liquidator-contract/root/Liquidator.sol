@@ -6,6 +6,7 @@ import "../lib/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IFlashLoanRec
 import { PositionManagerFacet } from "../lib/itos-position-manager/src/facets/PositionManagerFacet.sol";
 import { MockERC20 } from "../lib/itos-position-manager/test/mocks/MockERC20.sol";
 import {console2 as console, Script} from "forge-std/Script.sol";
+import { MintableERC20 } from "../lib/itos-position-manager/lib/itos-resolver/test/TestLib/ERC20.u.sol";
 
 struct LiquidationParams {
     uint256 portfolioId;
@@ -79,10 +80,14 @@ contract Liquidator is IFlashLoanRecipient {
         uint256[] calldata positionIds,
         bytes[] calldata instructions
     ) external nonReentrant {
-        console.log("in kliq");
+        console.log("in liquidateNoFlashLoan");
         // approve resolver to spend the specified amount of token
         for (uint256 i = 0; i < tokens.length; i++){
-            console.log("approving %d of %s", amounts[i], tokens[i]);
+            console.log("approving and minting %d of %s", amounts[i], tokens[i]);
+            MintableERC20(tokens[i]).mint(address(this), amounts[i]);
+            console.log("balance of %s: %d", tokens[i], MockERC20(tokens[i]).balanceOf(address(this)));
+
+            // approve the resolver to use that amount
             MockERC20(tokens[i]).approve(resolver, amounts[i]);
         }
         console.log("calling liq on the pm: %s", pm_addr);

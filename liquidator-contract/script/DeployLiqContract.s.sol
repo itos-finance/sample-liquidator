@@ -17,8 +17,8 @@ contract DeployLiqContractScript is Script {
         address weth = vm.envAddress("weth");
         vm.startBroadcast(deployerPrivateKey);
         Liquidator liq = new Liquidator(positionManagerAddr, balancerAddr);
-        MintableERC20(usdc).mint(address(liq), 100000e18);
-        MintableERC20(weth).mint(address(liq), 100000e18);
+        MintableERC20(usdc).mint(address(liq), 10000000000e18);
+        MintableERC20(weth).mint(address(liq), 10000000000e18);
         vm.stopBroadcast();
         //string memory base = "";
         //vm.serializeAddress(base, "LIQUIDATOR", address(liq));
