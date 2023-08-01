@@ -1,5 +1,16 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      }
+    ],
+    "name": "InvalidPortfolioId",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "defaultToken",
     "outputs": [
@@ -125,6 +136,11 @@
     "name": "getPosition",
     "outputs": [
       {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
         "components": [
           {
             "internalType": "enum PositionSource",
@@ -153,8 +169,21 @@
           }
         ],
         "internalType": "struct Position",
-        "name": "",
+        "name": "position",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getStables",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -304,6 +333,19 @@
   {
     "inputs": [],
     "name": "minNominal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minObligationSize",
     "outputs": [
       {
         "internalType": "uint256",

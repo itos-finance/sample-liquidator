@@ -1,7 +1,8 @@
 from web3 import Web3
 import struct
 
-
+# NOOP instruction
+NOOP = Web3.to_bytes(0x0)
 
 def create_itos_swap_instruction(is_exact_out, tokenIn, tokenOut, amountOut, amountIn, tickSpacing):
     opcode = None
@@ -55,3 +56,9 @@ def create_transferFrom_instruction(amount, token):
     instruction = opcode + amount_bytes + token_bytes
     print(Web3.to_bytes(instruction))
     return Web3.to_bytes(instruction)
+
+def merge_instructions(instr1, instr2):
+    if instr1 == None:
+        return instr2
+    else:
+        return instr1 + instr2

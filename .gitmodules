@@ -4,3 +4,6 @@
 [submodule "liquidator-contract/lib/forge-std"]
 	path = liquidator-contract/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "liquidator-contract/lib/balancer-v2-monorepo"]
+	path = liquidator-contract/lib/balancer-v2-monorepo
+	url = https://github.com/balancer/balancer-v2-monorepo.git

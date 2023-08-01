@@ -1,6 +1,27 @@
 [
   {
     "inputs": [],
+    "name": "AssetNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "requested",
+        "type": "uint256"
+      }
+    ],
+    "name": "InsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InsufficientSecurityDeposit",
     "type": "error"
   },
@@ -18,19 +39,19 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "assetId",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "token",
         "type": "address"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
@@ -43,7 +64,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "assetId",
         "type": "uint256"
@@ -62,7 +83,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "assetId",
         "type": "uint256"
@@ -81,13 +102,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "assetId",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "splitId",
         "type": "uint256"
@@ -106,19 +127,50 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "sourceAssetId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "recipientAssetId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TransferCollateral",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
         "internalType": "uint256",
         "name": "assetId",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "receiver",
         "type": "address"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "token",
         "type": "address"
@@ -343,7 +395,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_assetId",
+        "name": "assetId",
         "type": "uint256"
       }
     ],
@@ -445,6 +497,34 @@
         "type": "uint256"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "sourceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "recipientId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }
