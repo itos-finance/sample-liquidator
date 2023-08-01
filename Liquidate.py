@@ -45,7 +45,7 @@ class Liquidator:
         # tails needing liquidation. We must clear this at the end of each liquidation
         self.markedForLiq = []
 
-    #to be called by a function that calls the api to get accounts and discovers one with a liquidate-able portfolio
+    # to be called by a function that calls the api to get accounts and discovers one with a liquidate-able portfolio
     def liquidate_account(self, account):
         print("Looking for liquidate-able portfolio on account...")
         portfolios = self.pm_getter_contract.functions.getAllPortfolios(account).call()
@@ -91,34 +91,29 @@ class Liquidator:
                 print("     ", positions)
                 resolution_tokens = ResolutionTokens([self.liqToken], [portfolio_collateral], [self.get_token_id_from_address(self.liqToken)])
                 # how do we liquidate?
-                (close_instructions, additional_resTokens) = self.getInstructions(
+                (close_instructions, additional_resTokens, pos_to_liq) = self.getInstructions(
                     portfolio_id,
                     portfolio_collateral,
                     portfolio_debt,
                     resolution_tokens,
                     positions,
-                    portfolio_util,
-                    portfolio_tailUtils
+                    portfolio_util
                 )
                 resolution_tokens.add_resolution_tokens(additional_resTokens)
                 print("ciLen: ", len(close_instructions))
                 print("CLOSE_INSTRUCTIONS: ", close_instructions)
-                pos_to_liq = []
-                for x in range(0, len(positions)):
-                    pos_to_liq.append(Web3.to_int(positions[x]))
-                # call liquidate
+
                 print("resolver: ", self.resolver_address)
-                # get tokens to flash loan
 
                 # flash loan 10x the collateral amount to safely have enough TODO param the multiple so user can adjust if fail
                 resolution_tokens.amounts[0] = resolution_tokens.amounts[0] * 10
-
+                # call liquidate
                 self.liquidator_contract.functions.liquidateNoFlashLoan(
                     portfolio_id,
                     self.resolver_address,
                     resolution_tokens.tokens,
                     resolution_tokens.amounts,
-                    positions,
+                    pos_to_liq,
                     close_instructions
                 ).call()
 
@@ -135,6 +130,7 @@ class Liquidator:
         self.print_records(records, portfolio_id)
         print("     Collateral to Liq: " , collateral_to_liquidate)
         print("positions: ", positions)
+        positions_to_close = []
         # loop through the records to determine what we need to pay back
         for record in records:
             #position = self.get_position(position_id)
@@ -165,12 +161,13 @@ class Liquidator:
                             ix = InstructionsLib.NOOP
                             print("instr: ", ix)
                     instructions.append(ix)
+                positions_to_close = positions
             else:
                 print("partial liq")
                 # TODO: add liquidation if only part of the portfolio needs to be liquidated
         # instead of a noop, we may need to get rid of the tails and pay back the flash loan.
         instructions.append(InstructionsLib.NOOP)
-        return instructions, resolution_tokens
+        return instructions, resolution_tokens, positions_to_close
 
     # based on LiquidateLib:initLiquidation() in the pm
     def calcCreditAndDebtTargets(self, debt, collateral, portfolio_util):
@@ -207,6 +204,13 @@ class Liquidator:
                 debt_target = self.BASEX128
             credit_target = debt_target + ((debt_target * self.liquidationBonus) / self.BASEX128)
         return (debt_target, credit_target)
+
+    def liq_bonus_formula(self, base):
+        # round up
+        if ((base * (self.liquidationBonus - self.BASEX128) % self.BASEX128) != 0):
+            return ((base * (self.liquidationBonus - self.BASEX128)) / self.BASEX128) + 1
+        else:
+            return (base * (self.liquidationBonus - self.BASEX128)) / self.BASEX128
 
     # get a the token id from the resolver given the address of the token
     def get_token_id_from_address(self, token_address):
