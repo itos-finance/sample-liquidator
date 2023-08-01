@@ -82,14 +82,14 @@ contract Liquidator is IFlashLoanRecipient {
     ) external nonReentrant {
         console.log("in liquidateNoFlashLoan");
         // approve resolver to spend the specified amount of token
-        for (uint256 i = 0; i < tokens.length; i++){
-            console.log("approving and minting %d of %s", amounts[i], tokens[i]);
-            MintableERC20(tokens[i]).mint(address(this), amounts[i]);
-            console.log("balance of %s: %d", tokens[i], MockERC20(tokens[i]).balanceOf(address(this)));
 
-            // approve the resolver to use that amount
-            MockERC20(tokens[i]).approve(resolver, amounts[i]);
-        }
+        console.log("approving and minting %d of %s", amounts[0], tokens[0]);
+        MintableERC20(tokens[0]).mint(address(this), amounts[0]);
+        console.log("balance of %s: %d", tokens[0], MockERC20(tokens[0]).balanceOf(address(this)));
+        uint256 balanceBefore = MockERC20(tokens[0]).balanceOf(address(this));
+        // approve the resolver to use that amount
+        MockERC20(tokens[0]).approve(resolver, amounts[0]);
+
         console.log("calling liq on the pm: %s", pm_addr);
         PositionManagerFacet(pm_addr).liquidate(
             portfolioId,
@@ -97,6 +97,8 @@ contract Liquidator is IFlashLoanRecipient {
             positionIds,
             instructions
         );
+        // flash loan can be paid back
+        require(balanceBefore <= MockERC20(tokens[0]).balanceOf(address(this)), "flash loan pbk");
     }
 
 }

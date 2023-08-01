@@ -13,6 +13,7 @@ class Liquidator:
     # when token isn't in the registry, the resolver returns the max uint16 value as an error code
     NOT_IN_REGISTRY_CODE = 65535
 
+
     def __init__(
             self,
             pm_contract_getter_abi,
@@ -41,6 +42,9 @@ class Liquidator:
         self.targetUtil = self.pm_getter_contract.functions.targetUtil().call()
         self.liquidationBonus = self.pm_getter_contract.functions.liquidationBonus().call()
 
+        # tails needing liquidation. We must clear this at the end of each liquidation
+        self.markedForLiq = []
+
     #to be called by a function that calls the api to get accounts and discovers one with a liquidate-able portfolio
     def liquidate_account(self, account):
         print("Looking for liquidate-able portfolio on account...")
@@ -61,7 +65,7 @@ class Liquidator:
              portfolio_tailCredits,
              portfolio_tailDebts,
              _,
-             portfolio_utils) = self.pm_contract.functions.queryValuesUSD(portfolio_id).call()
+             portfolio_tailUtils) = self.pm_contract.functions.queryValuesUSD(portfolio_id).call()
             if(portfolio_debt > 0 or portfolio_collateral > 0 or len(portfolio_tailCredits) > 0):
                 print("     debt: ", portfolio_debt)
                 print("     req: ", portfolio_obligation)
@@ -70,11 +74,16 @@ class Liquidator:
                 print("     tails: ", portfolio_tails)
                 print("     tailDebts: ", portfolio_tailDebts)
                 print("     tailCredits: ", portfolio_tailCredits)
-                print("     utils: ", portfolio_utils)
+                print("     utils: ", portfolio_tailUtils)
 
+            # mark tails for liquidation
+            self.populateMarkedForLiq(portfolio_tails, portfolio_tailUtils)
 
             # is it eligible for liquidation?
-            if(((portfolio_util >= self.maxUtil and portfolio_util != 0)) or (portfolio_collateral > 0 and (portfolio_debt / portfolio_collateral >= self.maxUtil))):
+            if(((portfolio_util >= self.maxUtil and portfolio_util != 0))
+               or (portfolio_collateral > 0 and (portfolio_debt / portfolio_collateral >= self.maxUtil))
+               or len(self.markedForLiq) > 0
+            ):
                 print("     Found portfolio to liquidate: ", portfolio_id)
                 # get positions in the portfolio
                 positions = self.pm_getter_contract.functions.getPortfolio(account, i).call()
@@ -82,7 +91,15 @@ class Liquidator:
                 print("     ", positions)
                 resolution_tokens = ResolutionTokens([self.liqToken], [portfolio_collateral], [self.get_token_id_from_address(self.liqToken)])
                 # how do we liquidate?
-                (close_instructions, additional_resTokens) = self.getInstructions(portfolio_id, portfolio_collateral, portfolio_debt, resolution_tokens, positions)
+                (close_instructions, additional_resTokens) = self.getInstructions(
+                    portfolio_id,
+                    portfolio_collateral,
+                    portfolio_debt,
+                    resolution_tokens,
+                    positions,
+                    portfolio_util,
+                    portfolio_tailUtils
+                )
                 resolution_tokens.add_resolution_tokens(additional_resTokens)
                 print("ciLen: ", len(close_instructions))
                 print("CLOSE_INSTRUCTIONS: ", close_instructions)
@@ -93,81 +110,91 @@ class Liquidator:
                 print("resolver: ", self.resolver_address)
                 # get tokens to flash loan
 
-                # flash loan 10x the debt amount to safely have enough
-                amounts = list(map(lambda x: x * 10, resolution_tokens.amounts))
+                # flash loan 10x the collateral amount to safely have enough TODO param the multiple so user can adjust if fail
+                resolution_tokens.amounts[0] = resolution_tokens.amounts[0] * 10
 
                 self.liquidator_contract.functions.liquidateNoFlashLoan(
                     portfolio_id,
                     self.resolver_address,
                     resolution_tokens.tokens,
-                    amounts,
+                    resolution_tokens.amounts,
                     positions,
                     close_instructions
                 ).call()
 
+        self.markedForLiq.clear()
         return "Healthy"
 
-    def getInstructions(self, portfolio_id, portfolio_collateral, portfolio_debt, resolution_tokens, positions):
+    def getInstructions(self, portfolio_id, portfolio_collateral, portfolio_debt, resolution_tokens, positions, portfolio_util):
         instructions = []
         # NOOP for startResolution
-        instructions.append(Web3.to_bytes(0x0))
+        instructions.append(InstructionsLib.NOOP)
         # calculate how much to liquidate
-        (debt_to_liquidate, collateral_to_liquidate) = self.calcCreditAndDebtTargets(portfolio_debt, portfolio_collateral)
+        (debt_to_liquidate, collateral_to_liquidate) = self.calcCreditAndDebtTargets(portfolio_debt, portfolio_collateral, portfolio_util)
         records = self.get_records(portfolio_id)
         self.print_records(records, portfolio_id)
         print("     Collateral to Liq: " , collateral_to_liquidate)
-        # get the tokens and amounts in the portfolio:
-        for position_id in positions:
-            print("POSITION: ", position_id)
-            position = self.get_position(position_id)
+        print("positions: ", positions)
+        # loop through the records to determine what we need to pay back
+        for record in records:
+            #position = self.get_position(position_id)
             if (collateral_to_liquidate == portfolio_collateral):
-                if(position.isSourcePocketbook):
+                if(record.isSourcePocketbook):
                     ix = None
                     print("source is pb")
                     # Deposit. We liq the whole portfolio here so we close this.
-                    # just transferFrom this amount of this position's token from the liquidator to the resolver
-                    for tokenIdx in range(0, len(position.tokens)):
-                        token_in_id = self.get_token_id_from_address(position.tokens[tokenIdx])
-                        amount = position.credits[tokenIdx]
-                        ix1 = InstructionsLib.create_transferFrom_instruction(amount, token_in_id)
-                        print("ix: transfer")
-                        ix = InstructionsLib.merge_instructions(ix, ix1)
-                        resolution_tokens.add_resolution_token(position.tokens[tokenIdx], amount, token_in_id)
-                    instructions.append(ix)
+                    # We can do a NOOP here since this ix won't be passed to the resolver
+                    instructions.append(InstructionsLib.NOOP)
                 else:
                     print("source is amm")
                     # source is the AMM. If we have debt to pay in this token, do an exact output swap from any deposit balances we have
                     ix = None
-                    for tokenIdx in range(0, len(position.tokens)):
-                        if position.debts[tokenIdx] > 0:
-                            token_out_id = self.get_token_id_from_address(position.tokens[tokenIdx])
-                            debt = position.debts[tokenIdx]
-                            (_, balance, tokenId) = resolution_tokens.getAvailableToken()
+                    for tokenIdx in range(0, len(record.tokens)):
+                        if record.debts[tokenIdx] > 0:
+                            # if token has debt at it's index that's the fee amt and it must be paid back with the other token in the record.
+                            # we add in that amount extra of that token to account for the fee.
+                            paybackTokenIdx = 1 if tokenIdx == 0 else 0
+                            token_out_id = self.get_token_id_from_address(record.tokens[paybackTokenIdx])
+                            (_, balance, tokenId) = resolution_tokens.getPreferredInToken()
                             # TODO We hard code tickSpacing to 50 here. Need to account for different spacings
-                            # TODO might not be enough still. May have to add in another transferFrom before swaps
-                            # For now, assuming tokens_available[0] should cover it
-                            print("swapm instructuion")
-                            ix1 = InstructionsLib.create_itos_swap_instruction(True, tokenId, token_out_id, debt, balance, 50)
+                            print("swap instruction")
+                            # Passing in amountOut 0 tells the resolver to swap into whatever xDelta/yDelta the taker provides.
+                            ix1 = InstructionsLib.create_itos_swap_instruction(True, tokenId, token_out_id, 0, balance, 50)
                             ix = InstructionsLib.merge_instructions(ix, ix1)
                         else:
-                            print("transfer instr")
-                            token_in_id = self.get_token_id_from_address(position.tokens[tokenIdx])
-                            amount = position.credits[tokenIdx]
-                            ix1 = InstructionsLib.create_transferFrom_instruction(amount, token_in_id)
-                            print("instr: transfer amt ",  amount)
-                            print("tokID: ", token_in_id)
-                            ix = InstructionsLib.merge_instructions(ix, ix1)
+                            ix = InstructionsLib.NOOP
                             print("instr: ", ix)
-                            resolution_tokens.add_resolution_token(position.tokens[tokenIdx], amount, token_in_id)
                     instructions.append(ix)
             else:
                 print("partial liq")
                 # TODO: add liquidation if only part of the portfolio needs to be liquidated
-        instructions.append(Web3.to_bytes(0x0))
+        # instead of a noop, we may need to get rid of the tails and pay back the flash loan.
+        instructions.append(InstructionsLib.NOOP)
         return instructions, resolution_tokens
 
+    # based on LiquidateLib:initLiquidation() in the pm
+    def calcCreditAndDebtTargets(self, debt, collateral, portfolio_util):
+        collateral_target, debt_target = (0,0)
+        if (portfolio_util < self.maxUtil):
+            # just liq tails
+            collateral_target, debt_target = (0,0)
+        elif (portfolio_util >= self.maxUtil and debt == 0):
+            # case where no debt has accrued to a position, but the obligation has put it liquidation range.
+            # In this case, we liquidate zero debt and base the liquidation bonus on the collateral value.
+            collateral_target, debt_target = (0, self.liq_bonus_formula(collateral))
+        elif (portfolio_util > self.BASEX128):
+            bonus_USD = debt + self.liq_bonus_formula(debt)
+            if (bonus_USD > collateral):
+                bonus_USD = collateral
+            # if the portfolio is over 100% utilized, liquidate the entire debt and collateral
+            (debt_target, collateral_target) = (debt, bonus_USD)
+        else:
+            # liquidate based on the liquidation formula
+            (debt_target, collateral_target) = self.liquidationFormula(debt, collateral)
+        return debt_target, collateral_target
+
     # Calculate how much needs to be liquidated. This calculation is based off of LiquidateLib:liquidationFormula() in the position manager
-    def calcCreditAndDebtTargets(self, debt, collateral):
+    def liquidationFormula(self, debt, collateral):
         debt_target = 0
         credit_target = 0
         if(debt > collateral):
@@ -175,7 +202,7 @@ class Liquidator:
             credit_target = collateral
         else: #debt / collateral >= maxUtil
             util = debt / collateral
-            debt_target = (debt * (util - self.targetUtil)) / ( self.BASEX128 - ((self.targetUtil * self.liquidationBonus)/ self.BASEX128) )
+            debt_target = (debt * (util - self.targetUtil)) / ( self.BASEX128 - ((self.targetUtil * self.liquidationBonus) / self.BASEX128) )
             if debt_target > self.BASEX128:
                 debt_target = self.BASEX128
             credit_target = debt_target + ((debt_target * self.liquidationBonus) / self.BASEX128)
@@ -201,14 +228,21 @@ class Liquidator:
     def get_position(self, position_id):
         (portfolio_id, position) = self.pm_getter_contract.functions.getPosition(position_id).call()
         assetValue = self.pocketbook_contract.functions.queryValue(position[2]).call()
+        print("__________________________________")
+        print("POSITION: ", position_id)
+        print("rawPos: ", position)
         position_with_values = Position(portfolio_id, position, assetValue)
         print("ID: ", position_id)
+        print("portfolio: ", position_with_values.portfolio_id)
         print("     isPocketbook: ", position_with_values.isSourcePocketbook)
         print("     isDebt: ", position_with_values.isPositionDebt)
         print("     tokens: ", position_with_values.tokens)
         print("     deltas: ", position_with_values.deltas)
         print("     credits: ", position_with_values.credits)
         print("     debts: ", position_with_values.debts)
+        print("ASSET VALUE: ")
+        print(assetValue)
+        print("_____________________________________")
         return position_with_values
 
     def print_records(self, records, portfolio_id):
@@ -222,7 +256,12 @@ class Liquidator:
                 if (hasDebts):
                     print("         debts: ", records[i].debts[j])
                 else:
-                    print("         debts: 0")
+                    print("         debts: ?")
 
                 print("         deltas ", records[i].deltas[j])
 
+    # populate list of tails needing liquidation
+    def populateMarkedForLiq(self, tails, tail_utils):
+        for i in range(0, len(tails)):
+            if(tail_utils[i] > self.maxUtil):
+                self.markedForLiq.append(tails[i])

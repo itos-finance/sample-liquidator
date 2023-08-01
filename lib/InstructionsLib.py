@@ -1,7 +1,8 @@
 from web3 import Web3
 import struct
 
-
+# NOOP instruction
+NOOP = Web3.to_bytes(0x0)
 
 def create_itos_swap_instruction(is_exact_out, tokenIn, tokenOut, amountOut, amountIn, tickSpacing):
     opcode = None
