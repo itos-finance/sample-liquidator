@@ -12,9 +12,14 @@ class ResolutionTokens:
     # maintain list of tokens we may accumulate during the resolution. We want to swap out of these to the preferred in token
     # to repay the flash loan in endResolutionCB (the last instructions passed to the resolver)
     def add_resolution_token(self, token, amount, id):
-        self.tokens.append(token)
-        self.amounts.append(amount)
-        self.ids.append(id)
+        # if token is already in list, increment its amount. Else append. Preserves that tokens[0] is liq token
+        try:
+            idx = self.tokens.index(token)
+            self.amounts[idx] += amount
+        except ValueError:
+            self.tokens.append(token)
+            self.amounts.append(amount)
+            self.ids.append(id)
 
     def getPreferredInToken(self):
         return (self.tokens[0], self.amounts[0], self.ids[0])
