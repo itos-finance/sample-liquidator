@@ -91,6 +91,7 @@ class Liquidator:
             # mark tails for liquidation
             self.populateMarkedForLiq(portfolio_tails, portfolio_tailUtils)
 
+
         # is it eligible for liquidation?
         if(((portfolio_util >= self.maxUtil and portfolio_util != 0))
         or (portfolio_collateral > 0 and (portfolio_debt / portfolio_collateral >= self.maxUtil))
