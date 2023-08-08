@@ -27,12 +27,3 @@ class ResolutionTokens:
     def add_resolution_tokens(self, res_to_add):
         for i in range(0, len(res_to_add.tokens)):
             self.add_resolution_token(res_to_add.tokens[i], res_to_add.amounts[i], res_to_add.ids[i])
-
-class TokenMap:
-    def __init__(self, token, token_type):
-        self.available_tokens[token] = token_type
-
-class TokenType(Enum):
-    LIQ_TOKEN = 0
-    CORE_TOKEN = 1
-    TAIL_TOKEN = 2

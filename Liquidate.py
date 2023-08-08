@@ -121,11 +121,13 @@ class Liquidator:
             # flash loan a multiple of the amounts needed to safely have enough
             flashloan_amounts = list(map(lambda x: x * int(flashloan_scalar), resolution_tokens.amounts))
             # call liquidate
-            self.liquidator_contract.functions.liquidateNoFlashLoan(
-                portfolio_id,
-                self.resolver_address,
+            self.liquidator_contract.functions.liquidate(
                 resolution_tokens.tokens,
                 flashloan_amounts,
+                portfolio_id,
+                self.resolver_address,
+
+
                 pos_to_liq,
                 close_instructions
             ).call()

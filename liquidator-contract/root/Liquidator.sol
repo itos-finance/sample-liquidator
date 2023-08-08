@@ -37,21 +37,25 @@ contract Liquidator is IFlashLoanRecipient {
     }
 
     function liquidate(
-        IERC20[] memory flashLoanTokens,
+        address[] memory flashLoanTokens,
         uint256[] memory flashLoanAmounts,
-        bytes memory userFlashLoanData,
         uint256 portfolioId,
         address resolver,
         uint256[] calldata positionIds,
         bytes[] calldata instructions
     ) external nonReentrant{
+        IERC20[] memory flashLoanERCs = new IERC20[](flashLoanTokens.length);
+        for (uint i = 0; i < flashLoanTokens.length; i++){
+            flashLoanERCs[i] = IERC20(flashLoanTokens[i]);
+        }
+        bytes memory userFlashLoanData;
         params = LiquidationParams({
             portfolioId: portfolioId,
             resolver: resolver,
             positionIds: positionIds,
             instructions: instructions
         });
-        vault.flashLoan(this, flashLoanTokens, flashLoanAmounts, userFlashLoanData);
+        vault.flashLoan(this, flashLoanERCs, flashLoanAmounts, userFlashLoanData);
         delete params;
     }
 
