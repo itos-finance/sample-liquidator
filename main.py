@@ -14,10 +14,10 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/liquidate/<addr>/<factor>')
-def liquidate(addr, factor):
+@app.route('/liquidate/<addr>/<factor>/<simple_mode>')
+def liquidate(addr, factor, simple_mode):
     res = None
-    res = LIQUIDATOR.liquidate_account(addr, factor)
+    res = LIQUIDATOR.liquidate_account(addr, factor, simple_mode)
     return res
 
 

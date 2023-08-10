@@ -18,7 +18,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract IERC20[]",
+        "internalType": "address[]",
         "name": "flashLoanTokens",
         "type": "address[]"
       },
@@ -26,11 +26,6 @@
         "internalType": "uint256[]",
         "name": "flashLoanAmounts",
         "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes",
-        "name": "userFlashLoanData",
-        "type": "bytes"
       },
       {
         "internalType": "uint256",

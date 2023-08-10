@@ -48,13 +48,18 @@ contract Liquidator is IFlashLoanRecipient {
         for (uint i = 0; i < flashLoanTokens.length; i++){
             flashLoanERCs[i] = IERC20(flashLoanTokens[i]);
         }
-        bytes memory userFlashLoanData;
+        bytes memory userFlashLoanData;// = abi.encode(address(resolver));
         params = LiquidationParams({
             portfolioId: portfolioId,
             resolver: resolver,
             positionIds: positionIds,
             instructions: instructions
         });
+        console.log("Geting flashLoan...");
+        for (uint i = 0 ; i < flashLoanERCs.length; i++){
+            uint256 balance = flashLoanERCs[i].balanceOf(address(this));
+            console.log("%s balance in liq contract: %d", address(flashLoanERCs[i]), balance);
+        }
         vault.flashLoan(this, flashLoanERCs, flashLoanAmounts, userFlashLoanData);
         delete params;
     }
@@ -67,12 +72,23 @@ contract Liquidator is IFlashLoanRecipient {
         bytes memory userData
     ) external override {
         require(msg.sender == address(vault));
+        for (uint i = 0 ; i < tokens.length; i++){
+            uint256 balance = tokens[i].balanceOf(address(this));
+            console.log("%s balance in liq contract after rec: %d", address(tokens[i]), balance);
+            tokens[i].approve(params.resolver, amounts[i]);
+        }
         PositionManagerFacet(pm_addr).liquidate(
             params.portfolioId,
             params.resolver,
             params.positionIds,
             params.instructions
         );
+        console.log("lq");
+
+        for (uint i = 0 ; i < tokens.length; i++){
+            console.log("transferring %d of %s back to vault", amounts[i], address(tokens[i]));
+            tokens[i].transferFrom(address(this), address(vault), amounts[i]);
+        }
     }
 
     // liquidate without a flash loan
