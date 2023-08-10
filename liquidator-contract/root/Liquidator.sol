@@ -47,6 +47,7 @@ contract Liquidator is IFlashLoanRecipient {
         IERC20[] memory flashLoanERCs = new IERC20[](flashLoanTokens.length);
         for (uint i = 0; i < flashLoanTokens.length; i++){
             flashLoanERCs[i] = IERC20(flashLoanTokens[i]);
+            flashLoanERCs[i].approve(resolver, flashLoanAmounts[i]);
         }
         bytes memory userFlashLoanData;// = abi.encode(address(resolver));
         params = LiquidationParams({
@@ -83,11 +84,12 @@ contract Liquidator is IFlashLoanRecipient {
             params.positionIds,
             params.instructions
         );
-        console.log("lq");
+        console.log("lq. len toks: %d", tokens.length);
 
         for (uint i = 0 ; i < tokens.length; i++){
             console.log("transferring %d of %s back to vault", amounts[i], address(tokens[i]));
-            tokens[i].transferFrom(address(this), address(vault), amounts[i]);
+            tokens[i].transfer(address(vault), amounts[i]);
+            console.log("transferred");
         }
     }
 

@@ -17,7 +17,7 @@ CORS(app)
 @app.route('/liquidate/<addr>/<factor>/<simple_mode>')
 def liquidate(addr, factor, simple_mode):
     res = None
-    res = LIQUIDATOR.liquidate_account(addr, factor, simple_mode)
+    res = LIQUIDATOR.liquidate_account(addr, int(factor), simple_mode)
     return res
 
 
