@@ -61,9 +61,6 @@ contract Liquidator is IFlashLoanRecipient {
             leftoverBalances: new uint256[](tokensInvolved.length)
         });
 
-        for (uint y = 0; y < tokensInvolved.length; y++){
-            console.log("out token %d: %s", y, tokensInvolved[y]);
-        }
 
         IERC20[] memory flashLoanERCs = new IERC20[](flashLoanTokens.length);
         for (uint i = 0; i < flashLoanTokens.length; i++){
@@ -72,10 +69,8 @@ contract Liquidator is IFlashLoanRecipient {
 
         bytes memory userFlashLoanData;
 
-        console.log("Getting flashLoan...");
         for (uint i = 0 ; i < flashLoanERCs.length; i++){
             uint256 balance = flashLoanERCs[i].balanceOf(address(this));
-            console.log("%s balance in liq contract: %d", address(flashLoanERCs[i]), balance);
         }
 
         vault.flashLoan(this, flashLoanERCs, flashLoanAmounts, userFlashLoanData);
@@ -94,7 +89,6 @@ contract Liquidator is IFlashLoanRecipient {
         require(msg.sender == address(vault));
         for (uint i = 0 ; i < tokens.length; i++){
             uint256 balance = tokens[i].balanceOf(address(this));
-            console.log("%s balance in liq contract after rec: %d", address(tokens[i]), balance);
             tokens[i].approve(params.resolver, amounts[i]);
         }
         PositionManagerFacet(pm_addr).liquidate(
@@ -103,23 +97,16 @@ contract Liquidator is IFlashLoanRecipient {
             params.positionIds,
             params.instructions
         );
-        console.log("lq. len toks: %d", tokens.length);
-
         // see what we got
         populateLeftoverBalances();
 
         for (uint i = 0 ; i < tokens.length; i++){
-            console.log("balance of %s: %d", address(tokens[i]), tokens[i].balanceOf(address(this)));
-            console.log("transferring %d of %s back to vault", amounts[i], address(tokens[i]));
             int256 predictedBalanceAfterPayback = int256(tokens[i].balanceOf(address(this))) - int256(amounts[i]);
             if (predictedBalanceAfterPayback < 0){
-                console.log("   swapping %s, amt needed: %d", address(tokens[i]), uint256(-predictedBalanceAfterPayback));
                 swapOutLeftovers(tokens[i], -predictedBalanceAfterPayback);
             }
-            console.log("balance of %s before send: %d", address(tokens[i]), tokens[i].balanceOf(address(this)));
             tokens[i].transfer(address(vault), amounts[i]);
             populateLeftoverBalances();
-            console.log("transferred");
         }
     }
 
@@ -132,45 +119,31 @@ contract Liquidator is IFlashLoanRecipient {
         uint256[] calldata positionIds,
         bytes[] calldata instructions
     ) external nonReentrant {
-        console.log("in liquidateNoFlashLoan");
         uint256[] memory balanceBefore = new uint256[](amounts.length);
         // approve resolver to spend the specified amount of token
         for(uint i = 0; i < tokens.length; i++){
-            console.log("approving and minting %d of %s", amounts[i], tokens[i]);
             MintableERC20(tokens[i]).mint(address(this), amounts[i]);
-            console.log("balance of %s: %d", tokens[i], MockERC20(tokens[i]).balanceOf(address(this)));
             balanceBefore[i] = MockERC20(tokens[i]).balanceOf(address(this));
             // approve the resolver to use that amount
             MockERC20(tokens[i]).approve(resolver, amounts[i]);
         }
 
-        console.log("calling liq on the pm: %s", pm_addr);
         PositionManagerFacet(pm_addr).liquidate(
             portfolioId,
             resolver,
             positionIds,
             instructions
         );
-        console.log("liquidated.gday");
         // flash loan can be paid back
-        //require(balanceBefore[0] <= MockERC20(tokens[0]).balanceOf(address(this)), "flash loan pbk");
+        require(balanceBefore[0] <= MockERC20(tokens[0]).balanceOf(address(this)), "flash loan pbk");
     }
 
     /// @dev swaps out excess tokens not needed for the flash loan to the flash loan token. If we swap into more than what is needed to pay the flash loan,
     /// we add that excess balance to leftover balance list so it can also be used to help pay back flash loans
     function swapOutLeftovers(IERC20 tokenOut, int256 amountNeeded) internal {
-        console.log("==============================swapping leftovers for %s", address(tokenOut));
-        console.log("leftovers:");
-        for (uint c = 0; c < params.potentialLeftovers.length; c++){
-            console.log("   %d leftover of %s", params.leftoverBalances[c], params.potentialLeftovers[c]);
-            console.log("   actual balance of %s: %d", params.potentialLeftovers[c], IERC20(params.potentialLeftovers[c]).balanceOf(address(this)));
-        }
         uint i = 0;
         while (amountNeeded > 0){
             populateLeftoverBalances();
-            console.log("       idx: %d", i);
-            console.log("       amtNeede: %d", uint256(amountNeeded));
-            console.log("       balance of %s: %d", params.potentialLeftovers[i], IERC20(params.potentialLeftovers[i]).balanceOf(address(this)));
             if (params.potentialLeftovers[i] != address(tokenOut) && params.leftoverBalances[i] != 0){
                 IItosSwapRouter.ExactInputSingleParams memory swapParams = IItosSwapRouter.ExactInputSingleParams({
                     tokenIn: params.potentialLeftovers[i],
@@ -181,14 +154,10 @@ contract Liquidator is IFlashLoanRecipient {
                     amountOutMinimum: 0,
                     sqrtPriceLimitX96: 0
                 });
-                console.log("tokenIn: %s", params.potentialLeftovers[i]);
-                console.log("BALANCE OF TOKENIN: %d", IERC20(params.potentialLeftovers[i]).balanceOf(address(this)));
-                console.log("AMOUNT IN OF TOKIN: %d", params.leftoverBalances[i]);
+
                 IERC20(params.potentialLeftovers[i]).approve(itosRouter, params.leftoverBalances[i]);
                 uint256 amountRecieved = IItosSwapRouter(itosRouter).exactInputSingle(swapParams);
-                console.log("amount rec of %s: %d", address(tokenOut), amountRecieved);
                 amountNeeded -= int256(amountRecieved);
-                console.log("amount needed: %d", uint256(amountNeeded));
             }
             i += 1;
             if (i >= params.potentialLeftovers.length && amountNeeded > 0){
@@ -200,7 +169,6 @@ contract Liquidator is IFlashLoanRecipient {
     /// @dev populates array of potential leftover token balances. Does a balance query for each token, so
     /// it's kind of expensive gas-wise. These balances are used to help pay back the flash loan
     function populateLeftoverBalances() internal {
-        console.log("populatin");
         for (uint i = 0; i < params.potentialLeftovers.length; i++){
             params.leftoverBalances[i] = IERC20(params.potentialLeftovers[i]).balanceOf(address(this));
         }
