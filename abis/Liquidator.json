@@ -10,10 +10,39 @@
         "internalType": "address",
         "name": "_balancer_addr",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_itosRouter",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenX",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenY",
+        "type": "address"
+      }
+    ],
+    "name": "getTickSpacing",
+    "outputs": [
+      {
+        "internalType": "uint24",
+        "name": "tickSpacing",
+        "type": "uint24"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [
@@ -26,6 +55,11 @@
         "internalType": "uint256[]",
         "name": "flashLoanAmounts",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "outTokens",
+        "type": "address[]"
       },
       {
         "internalType": "uint256",
