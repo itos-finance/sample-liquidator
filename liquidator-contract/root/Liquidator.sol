@@ -8,6 +8,7 @@ import { MockERC20 } from "../lib/itos-position-manager/test/mocks/MockERC20.sol
 import {console2 as console, Script} from "forge-std/Script.sol";
 import { MintableERC20 } from "../lib/itos-position-manager/lib/itos-resolver/test/TestLib/ERC20.u.sol";
 import { IItosSwapRouter } from  "../lib/itos-position-manager/lib/itos-resolver/src/interfaces/IItosSwapRouter.sol";
+import { I2sAMMFactory } from "../lib/itos-position-manager/lib/itos-resolver/lib/V4AMM/lib/interfaces/I2sAMMFactory.sol";
 
 struct LiquidationParams {
     uint256 portfolioId;
@@ -24,6 +25,7 @@ contract Liquidator is IFlashLoanRecipient {
     LiquidationParams internal params;
     uint256 internal locked;
     address internal itosRouter;
+    address internal itosFactory;
 
 
     /// @notice simple reentrancy guard
@@ -34,12 +36,13 @@ contract Liquidator is IFlashLoanRecipient {
         locked = 1;
     }
 
-    constructor(address _pm, address _balancer_addr, address _itosRouter) {
+    constructor(address _pm, address _balancer_addr, address _itosRouter, address _itosFactory) {
         pm_addr = _pm;
         vault = IVault(_balancer_addr);
         itosRouter = _itosRouter;
         // init unlocked
         locked = 1;
+        itosFactory = _itosFactory;
     }
 
     function liquidate(
@@ -174,12 +177,21 @@ contract Liquidator is IFlashLoanRecipient {
         }
     }
 
-    /// @dev fucntion top get the tick spacing for an itos pool that can be uised to swap a token pair.
-    /// TODO make factory call once we get the other pieces working. For now, just return 50.
-    /// This function can be called by the liquidator service when assembing instructions as well
+    /// @dev fucntion top get the tick spacing for an itos pool that can be used to swap a token pair.
+    /// This function can be called by the liquidator service when assembing instructions as well.
+    /// Tests the most likely spacing (32) first, then checks the other possilbe spacing iof that pool
+    /// doesn't exist
     function getTickSpacing(address tokenX, address tokenY) public returns (uint24 tickSpacing){
-        // TODO hard coded val
-        tickSpacing = 50;
+        address pool;
+        tickSpacing = 32;
+        pool = I2sAMMFactory(itosFactory).getPool(tokenX, tokenY, tickSpacing);
+        if (pool == address(0)){
+            tickSpacing = 8;
+            pool = I2sAMMFactory(itosFactory).getPool(tokenX, tokenY, tickSpacing);
+            if (pool == address(0)){
+                revert("Pool for token pair doesn't exist");
+            }
+        }
     }
 
 

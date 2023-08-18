@@ -16,8 +16,9 @@ contract DeployLiqContractScript is Script {
         address usdc = vm.envAddress("usdc");
         address weth = vm.envAddress("weth");
         address router = vm.envAddress("router");
+        address factory = vm.envAddress("factory");
         vm.startBroadcast(deployerPrivateKey);
-        Liquidator liq = new Liquidator(positionManagerAddr, balancerAddr, router);
+        Liquidator liq = new Liquidator(positionManagerAddr, balancerAddr, router, factory);
 
         vm.stopBroadcast();
         // string memory base = "";

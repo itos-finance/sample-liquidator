@@ -7,6 +7,7 @@ import { MockBalancerVault } from "./Mocks/MockBalancerVault.sol";
 import { MockPM } from "./Mocks/MockPM.sol";
 import { MockSwapRouter } from "./Mocks/MockSwapRouter.sol";
 import { MockERC20 } from "../lib/itos-position-manager/test/mocks/MockERC20.sol";
+import { MockFactory } from "./Mocks/MockFactory.sol";
 
 contract LiquidatorProxy {
     function liquidateExt(
@@ -38,6 +39,7 @@ contract LiqTest is Test {
     MockBalancerVault balancer;
     LiquidatorProxy liqProxy;
     MockSwapRouter router;
+    MockFactory factory;
     MockERC20 usdc;
     MockERC20 weth;
     MockERC20 tok0;
@@ -48,7 +50,8 @@ contract LiqTest is Test {
         router = new MockSwapRouter(100);
         pm = new MockPM();
         balancer = new MockBalancerVault();
-        liquidator = new Liquidator(address(pm), address(balancer), address(router));
+        factory = new MockFactory();
+        liquidator = new Liquidator(address(pm), address(balancer), address(router), address(factory));
         liqProxy = new LiquidatorProxy();
         usdc = new MockERC20("USDC", "USDC", 6);
         weth = new MockERC20("WETH", "WETH", 18);
@@ -69,8 +72,10 @@ contract LiqTest is Test {
         tok1.mint(address(liquidator), 5e18);
         // liquidator flashLoaned some usdc and weth
         address[] memory flashLoanTokens = new address[](2);
-        flashLoanTokens[1] = address(usdc);
-        flashLoanTokens[0] =  address(weth);
+        // balancer wants tokens in 123abc order:
+       (address tokenA, address tokenB) = address(usdc) > address(weth) ? (address(weth), address(usdc)) : (address(usdc), address(weth));
+        flashLoanTokens[0] =  tokenA;
+        flashLoanTokens[1] = tokenB;
         uint256[] memory flashLoanAmounts = new uint256[](2);
         flashLoanAmounts[0] = uint256(1e18);
         flashLoanAmounts[1] = uint256(1e18);
@@ -100,8 +105,9 @@ contract LiqTest is Test {
         tok1.mint(address(liqProxy), 89);
         // liquidator flashLoaned some usdc and weth
         address[] memory flashLoanTokens = new address[](2);
-        flashLoanTokens[1] = address(usdc);
-        flashLoanTokens[0] =  address(weth);
+        (address tokenA, address tokenB) = address(usdc) > address(weth) ? (address(weth), address(usdc)) : (address(usdc), address(weth));
+        flashLoanTokens[0] =  tokenA;
+        flashLoanTokens[1] = tokenB;
         uint256[] memory flashLoanAmounts = new uint256[](2);
         flashLoanAmounts[0] = 1e18;
         flashLoanAmounts[1] = 1e18;
@@ -128,8 +134,9 @@ contract LiqTest is Test {
         tok0.mint(address(liquidator), 9e18);
         // liquidator flashLoaned some usdc and weth
         address[] memory flashLoanTokens = new address[](2);
-        flashLoanTokens[1] = address(usdc);
-        flashLoanTokens[0] =  address(weth);
+        (address tokenA, address tokenB) = address(usdc) > address(weth) ? (address(weth), address(usdc)) : (address(usdc), address(weth));
+        flashLoanTokens[0] =  tokenA;
+        flashLoanTokens[1] = tokenB;
         uint256[] memory flashLoanAmounts = new uint256[](2);
         flashLoanAmounts[0] = uint256(1e18);
         flashLoanAmounts[1] = uint256(1e18);

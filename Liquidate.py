@@ -129,19 +129,19 @@ class Liquidator:
         # use the entire portfolio collateral value as the base amount of the liq token to flash loan.
         resolution_tokens = ResolutionTokens(self.liqToken, portfolio.collateral_USD, self.get_token_id_from_address(self.liqToken))
         # keep track of out tokens
-        out_tokens = []
+        tokens_involved = []
         # how do we liquidate?
-        (close_instructions, additional_resTokens, pos_to_liq, additional_out_tokens) = self.get_liquidation_instructions(
+        (close_instructions, additional_resTokens, pos_to_liq, additional_tokens_involved) = self.get_liquidation_instructions(
             portfolio_id,
             portfolio,
             positions,
             resolution_tokens,
             simple_mode,
             flashloan_scalar,
-            out_tokens
+            tokens_involved
         )
         resolution_tokens.add_resolution_tokens(additional_resTokens)
-        out_tokens += additional_out_tokens
+        tokens_involved += additional_tokens_involved
         print("ciLen: ", len(close_instructions))
         print("CLOSE_INSTRUCTIONS: ", close_instructions)
 
@@ -153,7 +153,7 @@ class Liquidator:
         self.liquidator_contract.functions.liquidate(
             sorted_resolution_token_addresses,
             sorted_resolution_token_amounts,
-            out_tokens,
+            tokens_involved,
             portfolio_id,
             self.resolver_address,
             pos_to_liq,
@@ -162,7 +162,7 @@ class Liquidator:
         self.markedForLiq.clear()
         return "LIQUIDATED PORTFOLIO: " + str(portfolio_id)
 
-    def get_liquidation_instructions(self, portfolio_id, portfolio, positions, resolution_tokens, simple_mode, flashloan_scalar, out_tokens):
+    def get_liquidation_instructions(self, portfolio_id, portfolio, positions, resolution_tokens, simple_mode, flashloan_scalar, tokens_involved):
         instructions = []
         # NOOP for startResolution
         instructions.append(InstructionsLib.NOOP)
@@ -189,14 +189,14 @@ class Liquidator:
                 # positions_to_close[i] corresponds to records[i]
                 position_to_close = self.get_position(positions_to_close[i])
                 position_credits = sum(position_to_close.credits)
-                instructions, resolution_tokens, out_tokens = self.get_instructions_for_position(
+                instructions, resolution_tokens, tokens_involved = self.get_instructions_for_position(
                     record,
                     resolution_tokens,
                     instructions,
                     position_credits,
                     simple_mode,
                     flashloan_scalar,
-                    out_tokens
+                    tokens_involved
                 )
                 i += 1
         else:
@@ -207,14 +207,14 @@ class Liquidator:
                 record = records[iter]
                 position_to_close = self.get_position(positions[iter])
                 position_credits = sum(position_to_close.credits)
-                instructions, resolution_tokens, out_tokens = self.get_instructions_for_position(
+                instructions, resolution_tokens, tokens_involved = self.get_instructions_for_position(
                     record,
                     resolution_tokens,
                     instructions,
                     position_credits,
                     simple_mode,
                     flashloan_scalar,
-                    out_tokens
+                    tokens_involved
                 )
                 positions_to_close.append(positions[iter])
                 for tokenIdx in range(0, len(position_to_close.tokens)):
@@ -224,11 +224,11 @@ class Liquidator:
                 iter += 1
         # NOOP for endResolution
         instructions.append(InstructionsLib.NOOP)
-        return instructions, resolution_tokens, positions_to_close, out_tokens
+        return instructions, resolution_tokens, positions_to_close, tokens_involved
 
 
 
-    def get_instructions_for_position(self, record, resolution_tokens, instructions, position_credits, simple_mode, flashloan_scalar, out_tokens):
+    def get_instructions_for_position(self, record, resolution_tokens, instructions, position_credits, simple_mode, flashloan_scalar, tokens_involved):
         if (record.isSourcePocketbook):
             ix = None
             print("source is pocketbook")
@@ -260,11 +260,11 @@ class Liquidator:
             if (debt_token == self.liqToken):
                 transfer_amount = flashloan_scalar * (position_credits + record.debts[debtTokenIdx])
                 resolution_tokens.add_resolution_token(payback_token, transfer_amount, token_in_id)
-                out_tokens = self.add_out_token(out_tokens, debt_token)
             else:
                 transfer_amount = flashloan_scalar * (position_credits + record.debts[debtTokenIdx])
                 resolution_tokens.add_resolution_token(payback_token, transfer_amount, token_in_id)
-                out_tokens = self.add_out_token(out_tokens, debt_token)
+            tokens_involved = self.add_out_token(tokens_involved, debt_token)
+            tokens_involved = self.add_out_token(tokens_involved, payback_token)
             ix1 = InstructionsLib.create_transferFrom_instruction(transfer_amount, token_in_id)
             ix = InstructionsLib.merge_instructions(ix, ix1)
             # We don't know exactly how much tokenIn it will take to swap to the exact out amount we need, but it will be about what we get back from the taker (except fees).
@@ -292,7 +292,7 @@ class Liquidator:
                 ix1 = InstructionsLib.create_itos_swap_instruction(False, token_in_id, token_out_id, 0, amount, 50) # TODO tickspacing hardcoded
                 ix = InstructionsLib.merge_instructions(ix, ix1)
                 resolution_tokens.add_resolution_token(self.preferredInToken.token_addr, amount, self.preferredInToken.id)
-                out_tokens = self.add_out_token(out_tokens, record.tokens[0])
+
             if (record.tokens[1] in self.markedForLiq):
                 tails = True
                 token_in_id = self.preferredInToken.id
@@ -306,7 +306,6 @@ class Liquidator:
                 # keep track of the amount needed for flash loan
                 resolution_tokens.add_resolution_token(self.preferredInToken.token_addr, amount, self.preferredInToken.id)
                 # keep track of the out token so it can be used to help pay back the flash loan if left over
-                out_tokens = self.add_out_token(out_tokens, record.tokens[1])
 
             if (tails is False):
                 print("no tails")
@@ -321,11 +320,12 @@ class Liquidator:
                 ix1 = InstructionsLib.create_transferFrom_instruction(transfer_amount, token_id)
                 ix = InstructionsLib.merge_instructions(ix, ix1)
                 resolution_tokens.add_resolution_token(record.tokens[1], transfer_amount, token_id)
-                out_tokens = self.add_out_token(out_tokens, record.tokens[0])
-                out_tokens = self.add_out_token(out_tokens, record.tokens[1])
                 instructions.append(ix)
+            # add all the tokens we touch to a list to pass to the liq contract. this helps with the flash loan payback process
+            tokens_involved = self.add_out_token(tokens_involved, record.tokens[0])
+            tokens_involved = self.add_out_token(tokens_involved, record.tokens[1])
 
-        return instructions, resolution_tokens, out_tokens
+        return instructions, resolution_tokens, tokens_involved
 
 
     # based on LiquidateLib:initLiquidation() in the pm
@@ -430,9 +430,9 @@ class Liquidator:
             if(tail_utils[i] > self.maxUtil):
                 self.markedForLiq.append(tails[i])
 
-    def add_out_token(self, out_tokens, token_to_add):
-        if (token_to_add not in out_tokens):
+    def add_out_token(self, tokens_involved, token_to_add):
+        if (token_to_add not in tokens_involved):
             print("adding OUT token: ", token_to_add)
-            out_tokens.append(token_to_add)
+            tokens_involved.append(token_to_add)
 
-        return out_tokens
+        return tokens_involved
