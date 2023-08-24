@@ -3,11 +3,12 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import { LiquidationParams, Liquidator } from "../root/Liquidator.sol";
-import { MockBalancerVault } from "./Mocks/MockBalancerVault.sol";
-import { MockPM } from "./Mocks/MockPM.sol";
-import { MockSwapRouter } from "./Mocks/MockSwapRouter.sol";
+import { MockBalancerVault } from "@Mocks/MockBalancerVault.sol";
+import { MockFactory } from "@Mocks/MockFactory.sol";
+import { MockSwapRouter } from "@Mocks/MockSwapRouter.sol";
+import { MockPM } from "@Mocks/MockPM.sol";
 import { MockERC20 } from "../lib/itos-position-manager/test/mocks/MockERC20.sol";
-import { MockFactory } from "./Mocks/MockFactory.sol";
+
 
 contract LiquidatorProxy {
     function liquidateExt(

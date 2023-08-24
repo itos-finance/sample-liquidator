@@ -3,7 +3,14 @@ pragma solidity ^0.8.17;
 import { MockERC20 } from "../../lib/itos-position-manager/test/mocks/MockERC20.sol";
 import {console2 as console, Script} from "forge-std/Script.sol";
 
+/// @dev Simpler mock pm for liquidation contract testing. Main difference is that the
+/// instructions for liquidate are not sety as they would be by the python liquidator service
 contract MockPM {
+
+    uint256 internal maxUtil;
+    address internal liqToken;
+    uint256 internal targetUtil;
+    uint256 internal liquidationBonus;
 
     // To simplify the test setup, we mock that the pm does the transfers the resolver would, with simpler instructions
     function liquidate(
@@ -19,6 +26,8 @@ contract MockPM {
             MockERC20(flashLoanedTokens[i]).transferFrom(msg.sender, address(this), amountsToTake[i]);
         }
     }
+
+
 
 
 }

@@ -20,3 +20,5 @@ venv/*
 .DS_Store
 src/.DS_Store
 script/deploy
+.vscode/*
+.vscode

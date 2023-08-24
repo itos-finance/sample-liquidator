@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import { MockBalancerVault } from  "../test/Mocks/MockBalancerVault.sol";
+import { MockBalancerVault } from  "@Mocks/MockBalancerVault.sol";
 import { MintableERC20 } from "../lib/itos-position-manager/lib/itos-resolver/test/TestLib/ERC20.u.sol";
 
 contract DeployMockBalancerVault is Script {
