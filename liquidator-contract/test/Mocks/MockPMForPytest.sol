@@ -22,21 +22,17 @@ contract MockPMForPytest {
     mapping(uint256 => uint256[]) internal portfolioPositions;
     // positionId => portfolioId
     mapping(uint256 => uint256) internal assignments;
+    bytes internal instructionsRecieved;
 
     struct LocalVars {
-        uint256  _maxUtil;
-        address  liqToken;
-        uint256  _targetUtil;
-        uint256  _liquidationBonus;
-
+        uint256 _maxUtil;
+        address liqToken;
+        uint256 _targetUtil;
+        uint256 _liquidationBonus;
+        uint256 instructionLength;
         // incremented with every add
         uint256  nextPositionId;
         uint256  nextAssetId;
-        // fields used by the test script:
-        bytes[]  instructionsRecieved;
-        address[]  tokensInvolved;
-        uint256[]  amountsToTake;
-        uint256[]  amountsToReturn;
     }
 
     struct MockPortfolioParams{
@@ -46,11 +42,7 @@ contract MockPMForPytest {
         uint256 debtUSD;
         uint256 obligationUSD;
         uint256 utilization;
-        address[] tails;
-        uint256[] tailCredits;
-        uint256[] tailDebts;
-        uint256[] tailDeltaXVars;
-        uint256[] utils;
+
     }
 
     LocalVars internal vars;
@@ -69,9 +61,50 @@ contract MockPMForPytest {
         vars.nextAssetId = 0;
     }
 
-    // set up mock portfolio
+    // helper function used to add instructions to the instructions bytes. Merges two bytes arrays
+    function mergeBytes(bytes memory a, bytes memory b) public pure returns (bytes memory c) {
+        uint256 alen = a.length;
+        uint256 totallen = alen + b.length;
+        // Count the loops required for array a (sets of 32 bytes)
+        uint256 loopsa = (a.length + 31) / 32;
+        // Count the loops required for array b (sets of 32 bytes)
+        uint256 loopsb = (b.length + 31) / 32;
+        assembly {
+            let m := mload(0x40)
+            // Load the length of both arrays to the head of the new bytes array
+            mstore(m, totallen)
+            // Add the contents of a to the array
+            for { let i := 0 } lt(i, loopsa) { i := add(1, i) } {
+                mstore(add(m, mul(32, add(1, i))), mload(add(a, mul(32, add(1, i)))))
+            }
+            // Add the contents of b to the array
+            for { let i := 0 } lt(i, loopsb) { i := add(1, i) } {
+                mstore(add(m, add(mul(32, add(1, i)), alen)), mload(add(b, mul(32, add(1, i)))))
+            }
+            mstore(0x40, add(m, add(32, totallen)))
+            c := m
+        }
+    }
+
+    // can't store a nested calldata dynamic arrays to storage, so we flatten bytes[] to bytes with a "|" as a deliminator
+    function flattenAndStoreInstructions(bytes[] memory instructions) internal {
+        bytes memory delim = new bytes(0);
+        delim[0] = bytes1("|");
+        bytes memory instructionsToStore;
+        for (uint i = 0; i < instructions.length; i++){
+            instructionsToStore = mergeBytes(instructionsToStore, instructions[i]);
+            instructionsToStore = mergeBytes(instructionsToStore, delim);
+        }
+    }
+
+    //set up mock portfolio
     function setupMockPortfolio(
-       MockPortfolioParams memory params
+       MockPortfolioParams memory params,
+       address[] memory tails,
+        uint256[] memory tailCredits,
+        uint256[] memory tailDebts,
+        uint256[] memory tailDeltaXVars,
+        uint256[] memory utils
     ) public returns (uint256 portfolioID){
         portfolioID = derive(params.user, params.portNum);
         PortfolioData memory portData = PortfolioData({
@@ -79,11 +112,11 @@ contract MockPMForPytest {
             debtUSD: params.debtUSD,
             obligationUSD: params.obligationUSD,
             utilization: params.utilization,
-            tails: params.tails,
-            tailCredits: params.tailCredits,
-            tailDebts: params.tailDebts,
-            tailDeltaXVars: params.tailDeltaXVars,
-            utils : params.utils
+            tails: tails,
+            tailCredits: tailCredits,
+            tailDebts: tailDebts,
+            tailDeltaXVars: tailDeltaXVars,
+            utils : utils
         });
 
         portfolioDatas[portfolioID] = portData;
@@ -147,12 +180,7 @@ contract MockPMForPytest {
         uint256[] calldata positionIds,
         bytes[] calldata instructions
     ) external {
-        vars.instructionsRecieved = instructions;
-        // To simulate the liquidator spending the flashloan, just take tokens from it
-        address[] memory flashLoanedTokens = abi.decode(instructions[0], (address[]));
-        for (uint i = 0; i < vars.amountsToTake.length; i++){
-            MockERC20(flashLoanedTokens[i]).transferFrom(msg.sender, address(this), vars.amountsToTake[i]);
-        }
+        flattenAndStoreInstructions(instructions);
     }
 
     function maxUtil() external view returns (uint256) {
@@ -171,9 +199,9 @@ contract MockPMForPytest {
         return vars._liquidationBonus;
     }
 
-    // function getAllPortfolios(address user) external view returns (uint256[][] memory) {
-    //     return portfolios[user];
-    // }
+    function getAllPortfolios(address user) external view returns (uint256[][] memory) {
+        return portfolios[user];
+    }
 
     function getPortfolio(address user, uint8 portfolio) external view returns (uint256[] memory) {
         return portfolios[user][portfolio];
@@ -203,23 +231,20 @@ contract MockPMForPytest {
         return records[assetId];
     }
 
-    /**
-     * @notice Derives a portfolioId from a user address and portfolio number (0-255)
-     * @param self The address of the user
-     * @param portfolio The portfolio number
-     * @return portfolioId The portfolioId
-     */
+    // /**
+    //  * @notice Derives a portfolioId from a user address and portfolio number (0-255)
+    //  * @param self The address of the user
+    //  * @param portfolio The portfolio number
+    //  * @return portfolioId The portfolioId
+    //  */
     function derive(address self, uint8 portfolio) internal pure returns (uint256) {
         return uint256(uint160(self)) + (uint256(portfolio) << 160);
     }
 
     // to be called by the test script. Returns the instructions that were sent to the liquidator
-    function getInstructionsRecieved() public returns (bytes[] memory){
-        return vars.instructionsRecieved;
-    }
+    function getInstructionsRecieved() public returns (bytes memory){
 
-    function setTokensAndAmountsToTakeOrReturn(address[] memory tokens, uint256[] memory amounts) public {
-
+        return instructionsRecieved;
     }
 
 
