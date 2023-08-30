@@ -1,0 +1,106 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_mockPm",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "pm",
+        "type": "address"
+      }
+    ],
+    "name": "Liq",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenX",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenY",
+        "type": "address"
+      }
+    ],
+    "name": "getTickSpacing",
+    "outputs": [
+      {
+        "internalType": "uint24",
+        "name": "tickSpacing",
+        "type": "uint24"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "flashLoanTokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "flashLoanAmounts",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "tokensInvolved",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "resolver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "instructions",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "liquidate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newPm",
+        "type": "address"
+      }
+    ],
+    "name": "setPm",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

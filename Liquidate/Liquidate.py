@@ -1,4 +1,3 @@
-from ChainListener import get_provider
 from DataStructures.Position import Position
 from DataStructures.Record import Record
 from DataStructures.ResolutionTokens import ResolutionTokens
@@ -28,9 +27,9 @@ class Liquidator:
             liquidator_contract_abi,
             pm_contract_address,
             resolver_address,
-            liquidator_address
+            liquidator_address,
+            provider
         ):
-        provider = get_provider()
 
         self.resolver_address = resolver_address
         # get the position manager contract facets. We need a separate contract object per facet since they have
@@ -40,6 +39,7 @@ class Liquidator:
         self.pocketbook_contract = provider.eth.contract(address = pm_contract_address, abi = pocketbook_contract_abi)
         self.resolver_contract = provider.eth.contract(address = resolver_address, abi = resolver_contract_abi)
         self.liquidator_contract = provider.eth.contract(address = liquidator_address, abi = liquidator_contract_abi)
+        print("liq addr in liquidate py: ", liquidator_address)
 
         # get the static pm config values from getter facet and set them:
         self.maxUtil = self.pm_getter_contract.functions.maxUtil().call()
@@ -49,6 +49,7 @@ class Liquidator:
 
         # tails needing liquidation. We must clear this at the end of each liquidation
         self.markedForLiq = []
+        self.provider = provider
 
     # to be called by a function that calls the api to get accounts and discovers one with a liquidate-able portfolio
     def liquidate_account(self, account, flashloan_scalar, simple_mode):
@@ -148,17 +149,25 @@ class Liquidator:
         print("resolver: ", self.resolver_address)
         # balancer wants the tokens sorted
         sorted_resolution_token_addresses, sorted_resolution_token_amounts = resolution_tokens.get_token_addresses_and_balances_sorted()
-
+        print("sorted")
+        print(" calling liq...")
         # call liquidate
-        self.liquidator_contract.functions.liquidate(
-            sorted_resolution_token_addresses,
-            sorted_resolution_token_amounts,
-            tokens_involved,
-            portfolio_id,
-            self.resolver_address,
-            pos_to_liq,
-            close_instructions
-        ).call()
+        try:
+            self.liquidator_contract.functions.liquidate(
+                sorted_resolution_token_addresses,
+                sorted_resolution_token_amounts,
+                tokens_involved,
+                portfolio_id,
+                self.resolver_address,
+                pos_to_liq,
+                close_instructions
+            ).transact()
+        except Exception as e:
+            print("CAUGHT EXCEPTION DURING Liq EXECUTION: ", e)
+            logs = self.liquidator_contract.events.Liq().get_logs()
+            print("logs: ", logs)
+
+        print("liqqed")
         self.markedForLiq.clear()
         return "LIQUIDATED PORTFOLIO: " + str(portfolio_id)
 

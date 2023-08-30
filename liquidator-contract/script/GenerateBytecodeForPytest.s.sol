@@ -3,6 +3,8 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
 import { MockPMForPytest } from "@Mocks/MockPMForPytest.sol";
+import { MockLiquidator } from "@Mocks/MockLiquidatorContract.sol";
+import { MockResolver } from "@Mocks/MockResolver.sol";
 
 /// @dev an easy way to get the linked bytecode needed for pytest unit test is to deploy the contract. Bytecode will be under
 /// run-latest.json
@@ -21,6 +23,8 @@ contract GenerateBytecodeForPytest is Script {
         uint256 targetUtil = (7 * BASEX128) / 10;
         uint256 liqBonus = (5 * BASEX128) / 100 + BASEX128;
         MockPMForPytest mock = new MockPMForPytest(maxUtil, liqToken, targetUtil, liqBonus);
+        MockLiquidator liq = new MockLiquidator(address(mock));
+        MockResolver resolver = new MockResolver();
         vm.stopBroadcast();
     }
 }

@@ -7,24 +7,8 @@ import { Position, PositionSource } from "../../lib/itos-position-manager/src/Po
 import { Record } from "../../lib/itos-position-manager/src/Record.sol";
 import { PositionType } from "../../lib/itos-position-manager/src/PositionType.sol";
 
-contract MockPMForPytest {
 
-    uint256 constant MAX_PORTFOLIOS = 16;
-     // user => portfolioNum => positionid
-    mapping(address => uint256[][]) internal portfolios;
-    // portfolioID => PortfolioData
-    mapping(uint256 => PortfolioData) internal portfolioDatas;
-    // positionId => Position
-    mapping(uint256 => Position) internal positions;
-    // assetId => Record
-    mapping(uint256 => Record) internal records;
-    // portfolioID => positionIds
-    mapping(uint256 => uint256[]) internal portfolioPositions;
-    // positionId => portfolioId
-    mapping(uint256 => uint256) internal assignments;
-    bytes internal instructionsRecieved;
-
-    struct LocalVars {
+struct LocalVars {
         uint256 _maxUtil;
         address liqToken;
         uint256 _targetUtil;
@@ -44,6 +28,23 @@ contract MockPMForPytest {
         uint256 utilization;
 
     }
+
+contract MockPMForPytest {
+
+    uint256 constant MAX_PORTFOLIOS = 16;
+     // user => portfolioNum => positionid
+    mapping(address => uint256[][]) internal portfolios;
+    // portfolioID => PortfolioData
+    mapping(uint256 => PortfolioData) internal portfolioDatas;
+    // positionId => Position
+    mapping(uint256 => Position) internal positions;
+    // assetId => Record
+    mapping(uint256 => Record) internal records;
+    // portfolioID => positionIds
+    mapping(uint256 => uint256[]) internal portfolioPositions;
+    // positionId => portfolioId
+    mapping(uint256 => uint256) internal assignments;
+    bytes internal instructionsRecieved;
 
     LocalVars internal vars;
 
@@ -86,15 +87,57 @@ contract MockPMForPytest {
         }
     }
 
+     function addEmptyLiquidatablePortfolio(address user) public returns (uint256 portfolioID){
+        uint256 BASEX128 = 1 << 128;
+        MockPortfolioParams memory params = MockPortfolioParams({
+            user: user,
+            portNum: 0,
+            collateralUSD: 1e18,
+            debtUSD: 11e17,
+            obligationUSD: 1e18,
+            utilization: uint256((110 * BASEX128) / 100)
+        });
+        address[] memory tails = new address[](0);
+        uint256[] memory tailCredits = new uint256[](0);
+        uint256[] memory tailDebts = new uint256[](0);
+        uint256[] memory tailDeltaXVars = new uint256[](0);
+        uint256[] memory utils = new uint256[](0);
+        portfolioID = this.setupMockPortfolio(params, tails, tailCredits, tailDebts, tailDeltaXVars, utils);
+    }
+
+    function getRecievedInstructionLength() public returns (uint256 len){
+        len = vars.instructionLength;
+    }
+
+    function setupLiquidatablePortfolio(address user, address token0, address token1) public returns (uint256 portfolioId){
+        portfolioId = addEmptyLiquidatablePortfolio(user);
+        (uint256 positionId, uint256 assetId)= this.addMockPosition(0, 0, address(1), user, 0);
+        address[] memory tokens = new address[](2);
+        tokens[0] = token0;
+        tokens[1] = token1;
+        uint256[] memory credits = new uint256[](2);
+        credits[0] = 1e18;
+        credits[1] = 0;
+        uint256[] memory debts = new uint256[](2);
+        debts[0] = 11e17;
+        debts[1] = 0;
+        uint256[] memory deltas = new uint256[](2);
+        deltas[0] = 11e17;
+        deltas[1] = 0;
+        this.makeRecord(assetId, 0, address(1), tokens, credits, debts, deltas);
+    }
+
     // can't store a nested calldata dynamic arrays to storage, so we flatten bytes[] to bytes with a "|" as a deliminator
     function flattenAndStoreInstructions(bytes[] memory instructions) internal {
-        bytes memory delim = new bytes(0);
-        delim[0] = bytes1("|");
+        bytes memory delim = new bytes(1);
+        delim[0] = "|";
         bytes memory instructionsToStore;
         for (uint i = 0; i < instructions.length; i++){
             instructionsToStore = mergeBytes(instructionsToStore, instructions[i]);
-            instructionsToStore = mergeBytes(instructionsToStore, delim);
+            instructionsToStore = mergeBytes(instructionsToStore, bytes(delim));
         }
+        vars.instructionLength = instructions.length;
+        instructionsRecieved = instructionsToStore;
     }
 
     //set up mock portfolio
@@ -118,9 +161,11 @@ contract MockPMForPytest {
             tailDeltaXVars: tailDeltaXVars,
             utils : utils
         });
-
         portfolioDatas[portfolioID] = portData;
-        // init all portfolios to empty arrays
+        if(portfolios[params.user].length == 0){
+            portfolios[params.user] = new uint256[][](MAX_PORTFOLIOS);
+        }
+        // // init all portfolios to empty arrays
         for (uint i = 0; i < MAX_PORTFOLIOS; i++){
             portfolios[params.user][i] = new uint256[](0);
         }
@@ -134,8 +179,8 @@ contract MockPMForPytest {
         address sourceAddress,
         address owner,
         uint8 portfolio
-    ) public {
-        uint256 positionId = vars.nextPositionId;
+    ) public returns (uint256 positionId, uint256 assetId){
+        positionId = vars.nextPositionId;
         vars.nextPositionId ++;
         uint256 portfolioId = derive(owner, portfolio);
         portfolios[owner][portfolio].push(positionId);
@@ -146,6 +191,7 @@ contract MockPMForPytest {
             sourceAddress: sourceAddress,
             owner: owner
         });
+        assetId = vars.nextAssetId;
         positions[positionId] = position;
         portfolioPositions[portfolioId].push(positionId);
         vars.nextAssetId ++;
@@ -173,7 +219,6 @@ contract MockPMForPytest {
         records[assetId] = record;
     }
 
-    // TODO need to transfer from the liquidatior but can't use the instructions
     function liquidate(
         uint256 portfolioId,
         address resolver,
@@ -245,6 +290,20 @@ contract MockPMForPytest {
     function getInstructionsRecieved() public returns (bytes memory){
 
         return instructionsRecieved;
+    }
+
+    function getInstructionsRecieved2D() public returns (bytes[] memory){
+        bytes memory instructionsRecieved = instructionsRecieved;
+        bytes[] memory unflattened = new bytes[](vars.instructionLength);
+        uint iter = 0;
+        for (uint i = 0; i < instructionsRecieved.length; i++){
+            if (instructionsRecieved[i] == bytes1("|")){
+                iter += 1;
+            } else {
+                unflattened[iter] = mergeBytes(unflattened[iter], abi.encodePacked(instructionsRecieved[i]));
+            }
+        }
+        return unflattened;
     }
 
 

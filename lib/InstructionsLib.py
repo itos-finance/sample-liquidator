@@ -54,7 +54,7 @@ def create_transferFrom_instruction(amount, token):
     amount_bytes = amount.to_bytes(32, byteorder='big')
     token_bytes = struct.pack('>H', token)
     instruction = opcode + amount_bytes + token_bytes
-    print(Web3.to_bytes(instruction))
+    print("AMT BYTES TRFM: ", amount_bytes)
     return Web3.to_bytes(instruction)
 
 def merge_instructions(instr1, instr2):
