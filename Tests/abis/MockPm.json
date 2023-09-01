@@ -31,6 +31,26 @@
         "internalType": "address",
         "name": "user",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "collateral",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "debt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "obligation",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "util",
+        "type": "uint256"
       }
     ],
     "name": "addEmptyLiquidatablePortfolio",

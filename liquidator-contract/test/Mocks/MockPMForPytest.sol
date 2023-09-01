@@ -87,15 +87,14 @@ contract MockPMForPytest {
         }
     }
 
-     function addEmptyLiquidatablePortfolio(address user) public returns (uint256 portfolioID){
-        uint256 BASEX128 = 1 << 128;
+     function addEmptyLiquidatablePortfolio(address user, uint256 collateral, uint256 debt, uint256 obligation, uint256 util) public returns (uint256 portfolioID){
         MockPortfolioParams memory params = MockPortfolioParams({
             user: user,
             portNum: 0,
-            collateralUSD: 1e18,
-            debtUSD: 11e17,
-            obligationUSD: 1e18,
-            utilization: uint256((110 * BASEX128) / 100)
+            collateralUSD: collateral,
+            debtUSD: debt,
+            obligationUSD: obligation,
+            utilization: util
         });
         address[] memory tails = new address[](0);
         uint256[] memory tailCredits = new uint256[](0);
@@ -110,7 +109,9 @@ contract MockPMForPytest {
     }
 
     function setupLiquidatablePortfolio(address user, address token0, address token1) public returns (uint256 portfolioId){
-        portfolioId = addEmptyLiquidatablePortfolio(user);
+        uint256 BASEX128 = 1 << 128;
+        uint256 util = uint256((110 * BASEX128) / 100);
+        portfolioId = addEmptyLiquidatablePortfolio(user, 1e18, 11e17, 1e18, util);
         (uint256 positionId, uint256 assetId)= this.addMockPosition(0, 0, address(1), user, 0);
         address[] memory tokens = new address[](2);
         tokens[0] = token0;
@@ -293,7 +294,6 @@ contract MockPMForPytest {
     }
 
     function getInstructionsRecieved2D() public returns (bytes[] memory){
-        bytes memory instructionsRecieved = instructionsRecieved;
         bytes[] memory unflattened = new bytes[](vars.instructionLength);
         uint iter = 0;
         for (uint i = 0; i < instructionsRecieved.length; i++){
