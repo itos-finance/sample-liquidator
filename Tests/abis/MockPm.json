@@ -1,0 +1,664 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "maxUtilIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "liqTokenIn",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "targetUtilIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liquidationBonusIn",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "collateral",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "debt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "obligation",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "util",
+        "type": "uint256"
+      }
+    ],
+    "name": "addEmptyLiquidatablePortfolio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioID",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "positionSource",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "positionType",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "sourceAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "portfolio",
+        "type": "uint8"
+      }
+    ],
+    "name": "addMockPosition",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "defaultToken",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getAllPortfolios",
+    "outputs": [
+      {
+        "internalType": "uint256[][]",
+        "name": "",
+        "type": "uint256[][]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getInstructionsRecieved",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getInstructionsRecieved2D",
+    "outputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "",
+        "type": "bytes[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "portfolio",
+        "type": "uint8"
+      }
+    ],
+    "name": "getPortfolio",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPosition",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "enum PositionSource",
+            "name": "source",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum PositionType",
+            "name": "positionType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "assetId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "sourceAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct Position",
+        "name": "position",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRecievedInstructionLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "len",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "resolver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "positionIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "instructions",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "liquidate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidationBonus",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "positionSource",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "sourceAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "credits",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "debts",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "deltas",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "makeRecord",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxUtil",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "a",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "b",
+        "type": "bytes"
+      }
+    ],
+    "name": "mergeBytes",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "c",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      }
+    ],
+    "name": "queryValue",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum PositionSource",
+            "name": "source",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "sourceAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "tokens",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "credits",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "debts",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "deltas",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct Record",
+        "name": "record",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      }
+    ],
+    "name": "queryValuesNative",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum PositionSource",
+            "name": "source",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "sourceAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "tokens",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "credits",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "debts",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "deltas",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct Record[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioID",
+        "type": "uint256"
+      }
+    ],
+    "name": "queryValuesUSD",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "collateralUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "debtUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "obligationUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "utilization",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "tails",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "tailCredits",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "tailDebts",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "tailDeltaXVars",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "utils",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct PortfolioData",
+        "name": "portfolio",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "token0",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "token1",
+        "type": "address"
+      }
+    ],
+    "name": "setupLiquidatablePortfolio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "internalType": "uint8",
+            "name": "portNum",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "debtUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "obligationUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "utilization",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct MockPortfolioParams",
+        "name": "params",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address[]",
+        "name": "tails",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "tailCredits",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "tailDebts",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "tailDeltaXVars",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "utils",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "setupMockPortfolio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "portfolioID",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "targetUtil",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

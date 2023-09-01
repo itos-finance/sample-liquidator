@@ -1,7 +1,8 @@
 
 class Position:
-    def __init__(self, portfolio_id, position, assetValue):
+    def __init__(self, portfolio_id, position_id, position, assetValue):
         self.portfolio_id = portfolio_id
+        self.position_id = position_id
         source = position[0] # 0 if source is AMM, 1 if source is pocketbook
         positionType = position[1]  # 0 if credit position, 1 if debt position
         self.assetId = position[2]

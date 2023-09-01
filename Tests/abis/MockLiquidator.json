@@ -3,22 +3,25 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_pm",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_balancer_addr",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_itosRouter",
+        "name": "_mockPm",
         "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "pm",
+        "type": "address"
+      }
+    ],
+    "name": "Liq",
+    "type": "event"
   },
   {
     "inputs": [
@@ -58,7 +61,7 @@
       },
       {
         "internalType": "address[]",
-        "name": "outTokens",
+        "name": "tokensInvolved",
         "type": "address[]"
       },
       {
@@ -90,65 +93,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "portfolioId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
-        "name": "resolver",
+        "name": "newPm",
         "type": "address"
-      },
-      {
-        "internalType": "address[]",
-        "name": "tokens",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "positionIds",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes[]",
-        "name": "instructions",
-        "type": "bytes[]"
       }
     ],
-    "name": "liquidateNoFlashLoan",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IERC20[]",
-        "name": "tokens",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "feeAmounts",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes",
-        "name": "userData",
-        "type": "bytes"
-      }
-    ],
-    "name": "receiveFlashLoan",
+    "name": "setPm",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

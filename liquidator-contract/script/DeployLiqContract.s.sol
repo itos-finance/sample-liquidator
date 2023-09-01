@@ -11,14 +11,15 @@ contract DeployLiqContractScript is Script {
     function run() public {
         address deployerAddr = vm.envAddress("DEPLOYER_PUBLIC_KEY");
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
-        address balancerAddr = 0x5Ab2232a0c296f0ae6D73140bFeFc4316970224F;
+        address balancerAddr =  0x7a3bdA2705145eb4c45ff6C2f079FbCB70E22e84;
         address positionManagerAddr = vm.envAddress("diamond");
         address usdc = vm.envAddress("usdc");
         address weth = vm.envAddress("weth");
+        address router = vm.envAddress("router");
+        address factory = vm.envAddress("factory");
         vm.startBroadcast(deployerPrivateKey);
-        Liquidator liq = new Liquidator(positionManagerAddr, balancerAddr);
-        MintableERC20(usdc).mint(address(liq), 10000000000e18);
-        MintableERC20(weth).mint(address(liq), 10000000000e18);
+        Liquidator liq = new Liquidator(positionManagerAddr, balancerAddr, router, factory);
+
         vm.stopBroadcast();
         // string memory base = "";
         // vm.serializeAddress(base, "LIQUIDATOR", address(liq));
@@ -26,3 +27,7 @@ contract DeployLiqContractScript is Script {
         console2.log("liquidator contract addr: %s", address(liq));
     }
 }
+// 400000000000001000000
+// 150155943834583101222050520
+// 2000000400000000000001001000
+// 4000000400000000000001001000

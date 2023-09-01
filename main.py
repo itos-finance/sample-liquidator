@@ -7,8 +7,9 @@ from web3 import Web3
 import os
 from lib.Utils import get_abi, derive_portfolio_id
 from dotenv import load_dotenv
+from ChainListener import get_provider
 
-from Liquidate import Liquidator
+from Liquidate.Liquidate import Liquidator
 
 app = Flask(__name__)
 CORS(app)
@@ -17,7 +18,7 @@ CORS(app)
 @app.route('/liquidate/<addr>/<factor>/<simple_mode>')
 def liquidate(addr, factor, simple_mode):
     res = None
-    res = LIQUIDATOR.liquidate_account(addr, factor, simple_mode)
+    res = LIQUIDATOR.liquidate_account(addr, int(factor), simple_mode)
     return res
 
 
@@ -39,8 +40,8 @@ def main(args):
     pocketbook_abi = get_abi("./abis/PocketbookFacet.json")
     resolver_abi = get_abi("./abis/Resolver.json")
     liquidator_abi = get_abi("./abis/Liquidator.json")
-    account = os.getenv('DEPLOYER_PUBLIC_KEY')
-    LIQUIDATOR = Liquidator(getter_abi, pm_abi, pocketbook_abi, resolver_abi, liquidator_abi, args.pm_contract, args.resolver, args.liquidator)
+    provider = get_provider()
+    LIQUIDATOR = Liquidator(getter_abi, pm_abi, pocketbook_abi, resolver_abi, liquidator_abi, args.pm_contract, args.resolver, args.liquidator, provider)
     app.run(host="localhost", port=args.port)
 
 
