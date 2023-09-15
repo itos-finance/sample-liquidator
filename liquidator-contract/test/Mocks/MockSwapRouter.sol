@@ -23,18 +23,18 @@ contract MockSwapRouter is IItosSwapRouter {
         _returnFactor = newFactor;
     }
 
-    function exactOutputSingle(ExactOutputSingleParams memory params) external payable returns (uint256 amountOut){
+    function exactOutputSingle(ExactOutputSingleParams memory params) external payable returns (uint256 amountIn, uint256 amountOut){
         uint256 amountIn = params.amountInMaximum > params.amountOut ? params.amountOut : params.amountInMaximum;
         MockERC20(params.tokenIn).transferFrom(msg.sender, address(this), amountIn);
         MockERC20(params.tokenOut).mint(params.recipient, params.amountOut);
-        return params.amountOut;
+        return (amountIn, params.amountOut);
     }
 
-    function exactInputSingle(ExactInputSingleParams memory params) external payable returns (uint256 amountOut){
+    function exactInputSingle(ExactInputSingleParams memory params) external payable returns (uint256 amountIn, uint256 amountOut){
         uint256 calculatedReturnAmount = calculateAmountToReturn(params.amountIn);
         amountOut = params.amountOutMinimum > params.amountIn ? params.amountOutMinimum : calculatedReturnAmount;
         MockERC20(params.tokenIn).transferFrom(msg.sender, address(this), params.amountIn);
         MockERC20(params.tokenOut).mint(params.recipient, amountOut);
-        return amountOut;
+        return (params.amountIn, amountOut);
     }
 }

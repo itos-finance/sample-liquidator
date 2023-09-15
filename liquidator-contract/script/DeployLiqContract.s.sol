@@ -11,7 +11,7 @@ contract DeployLiqContractScript is Script {
     function run() public {
         address deployerAddr = vm.envAddress("DEPLOYER_PUBLIC_KEY");
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
-        address balancerAddr =  0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5;
+        address balancerAddr =  0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB;
         address positionManagerAddr = vm.envAddress("DIAMOND");
         address usdc = vm.envAddress("USDC");
         address weth = vm.envAddress("WETH");

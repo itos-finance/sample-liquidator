@@ -131,7 +131,7 @@ contract Liquidator is IFlashLoanRecipient {
             MockERC20(tokens[i]).approve(resolver, amounts[i]);
         }
 
-        PositionManagerFacet(pm_addr).liquidate(
+        PortfolioLiquidationFacet(pm_addr).liquidate(
             portfolioId,
             resolver,
             positionIds,
@@ -155,11 +155,12 @@ contract Liquidator is IFlashLoanRecipient {
                     recipient: address(this),
                     amountIn: params.leftoverBalances[i],
                     amountOutMinimum: 0,
+                    deadline: block.timestamp + 25000,
                     sqrtPriceLimitX96: 0
                 });
 
                 IERC20(params.potentialLeftovers[i]).approve(itosRouter, params.leftoverBalances[i]);
-                uint256 amountRecieved = IItosSwapRouter(itosRouter).exactInputSingle(swapParams);
+                (, uint256 amountRecieved) = IItosSwapRouter(itosRouter).exactInputSingle(swapParams);
                 amountNeeded -= int256(amountRecieved);
             }
             i += 1;
