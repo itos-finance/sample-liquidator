@@ -12,6 +12,7 @@ contract DeployLiqContractScript is Script {
         address deployerAddr = vm.envAddress("DEPLOYER_PUBLIC_KEY");
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         address balancerAddr =  0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5;
+
         address positionManagerAddr = vm.envAddress("DIAMOND");
         address usdc = vm.envAddress("USDC");
         address weth = vm.envAddress("WETH");
@@ -27,7 +28,3 @@ contract DeployLiqContractScript is Script {
         console2.log("liquidator contract addr: %s", address(liq));
     }
 }
-// 400000000000001000000
-// 150155943834583101222050520
-// 2000000400000000000001001000
-// 4000000400000000000001001000
