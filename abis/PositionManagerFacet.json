@@ -1,6 +1,11 @@
 [
   {
     "inputs": [],
+    "name": "GracePeriodNotOver",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "IncompleteLiquidation",
     "type": "error"
   },
@@ -17,22 +22,6 @@
   {
     "inputs": [],
     "name": "InsufficientRefundUSD",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "InsufficientSplit",
     "type": "error"
   },
   {
@@ -78,6 +67,16 @@
   {
     "inputs": [],
     "name": "PositionNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SenderNotApproved",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SequencerDown",
     "type": "error"
   },
   {
@@ -183,37 +182,6 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "liquidator",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "portfolioId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "positionIds",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "Liquidate",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
         "indexed": false,
         "internalType": "uint256",
         "name": "position",
@@ -258,6 +226,43 @@
       }
     ],
     "name": "Split",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "portfolio",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "positionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "producer",
+        "type": "address"
+      }
+    ],
+    "name": "UninstallAsset",
     "type": "event"
   },
   {
@@ -322,6 +327,11 @@
         "internalType": "uint8",
         "name": "portfolio",
         "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
       }
     ],
     "name": "installAsset",
@@ -338,29 +348,25 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "portfolioId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
-        "name": "resolver",
+        "name": "installer",
         "type": "address"
       },
       {
-        "internalType": "uint256[]",
-        "name": "positionIds",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes[]",
-        "name": "instructions",
-        "type": "bytes[]"
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
       }
     ],
-    "name": "liquidate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "isApprovedInstaller",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "isApproved",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -518,6 +524,62 @@
     ],
     "name": "split",
     "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "posId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "uninstallAsset",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum PositionSource",
+            "name": "source",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "sourceAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "tokens",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "credits",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "debts",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "deltas",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct Record",
+        "name": "record",
+        "type": "tuple"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   }
