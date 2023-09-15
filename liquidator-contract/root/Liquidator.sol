@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import "../lib/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IVault.sol";
 import "../lib/balancer-v2-monorepo/pkg/interfaces/contracts/vault/IFlashLoanRecipient.sol";
-import { PositionManagerFacet } from "../lib/itos-position-manager/src/facets/PositionManagerFacet.sol";
+import { PortfolioLiquidationFacet } from "../lib/itos-position-manager/src/facets/PortfolioLiquidationFacet.sol";
 import { MockERC20 } from "../lib/itos-position-manager/test/mocks/MockERC20.sol";
 import {console2 as console, Script} from "forge-std/Script.sol";
 import { MintableERC20 } from "../lib/itos-position-manager/lib/itos-resolver/test/TestLib/ERC20.u.sol";
@@ -94,7 +94,7 @@ contract Liquidator is IFlashLoanRecipient {
             uint256 balance = tokens[i].balanceOf(address(this));
             tokens[i].approve(params.resolver, amounts[i]);
         }
-        PositionManagerFacet(pm_addr).liquidate(
+        PortfolioLiquidationFacet(pm_addr).liquidate(
             params.portfolioId,
             params.resolver,
             params.positionIds,
