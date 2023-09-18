@@ -1,6 +1,7 @@
+import json
 import os
 import subprocess
-import json
+
 from dotenv import load_dotenv
 
 BASEDIR = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
@@ -35,13 +36,10 @@ def read_json_to_envir(json_file_path):
 FORK_URL = os.getenv('FORK_URL') or 'http://localhost:8545'
 DEPLOYER_PUBLIC_KEY = os.getenv('DEPLOYER_PUBLIC_KEY')
 
-# Define the commands to be executed: open taker position, make a ton of trades to rack up debt, change the price to bring the position into
-# liquidation territory, register the tokens involved to the resolver, and deploy the liquidator contract (in adjacent repo).
-# TODO: deploy a mock balancer for flash loans
-commands = [f'forge script DeployMockBalancerVault.s.sol:DeployMockBalancerVault --fork-url http://127.0.0.1:8545 -vvvvv --ffi --broadcast']
+# Define the commands to be executed:
+commands = [f'forge script DeployMockBalancerVault.s.sol:DeployMockBalancerVault --fork-url {FORK_URL} -vvvvvv --ffi --broadcast --sender {DEPLOYER_PUBLIC_KEY}']
 # pull deployment info into env
 read_json_to_envir('../../../itos-deploy/script/core/deployment/combined.json')
-
 
 # iterate commands
 for command in commands:

@@ -11,13 +11,13 @@ contract DeployLiqContractScript is Script {
     function run() public {
         address deployerAddr = vm.envAddress("DEPLOYER_PUBLIC_KEY");
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
-        address balancerAddr =  0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5;
+        address balancerAddr =  0x2a8F692ad09C0DaCf98F5738c2ab9A7A5ca3e26a;
+        address positionManagerAddr = 0x26055d2bFd7de6c653b79E3b43B8F59D3f5b38a1;//vm.envAddress("DIAMOND");
+        //address usdc = vm.envAddress("USDC");
+        //address weth = vm.envAddress("WETH");
+        address router = 0x6822bFe69df8F2c857edd8b1f224Fb5805FbFBB6; //vm.envAddress("ROUTER");
+        address factory = 0xb2f0D984330C3B3F947523bD919437A303Fa7f81;//vm.envAddress("FACTORY");
 
-        address positionManagerAddr = vm.envAddress("DIAMOND");
-        address usdc = vm.envAddress("USDC");
-        address weth = vm.envAddress("WETH");
-        address router = vm.envAddress("ROUTER");
-        address factory = vm.envAddress("FACTORY");
         vm.startBroadcast(deployerPrivateKey);
         Liquidator liq = new Liquidator(positionManagerAddr, balancerAddr, router, factory);
 
