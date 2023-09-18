@@ -18,7 +18,8 @@ CORS(app)
 @app.route('/liquidate/<addr>/<factor>/<simple_mode>')
 def liquidate(addr, factor, simple_mode):
     res = None
-    res = LIQUIDATOR.liquidate_account(addr, int(factor), simple_mode)
+    address = Web3.to_checksum_address(str(addr))
+    res = LIQUIDATOR.liquidate_account(address, int(factor), simple_mode)
     return res
 
 

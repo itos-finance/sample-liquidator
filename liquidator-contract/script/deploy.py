@@ -35,11 +35,9 @@ def read_json_to_envir(json_file_path):
 FORK_URL = os.getenv('FORK_URL') or 'http://localhost:8545'
 DEPLOYER_PUBLIC_KEY = os.getenv('DEPLOYER_PUBLIC_KEY')
 
-# Define the commands to be executed: open taker position, make a ton of trades to rack up debt, change the price to bring the position into
-# liquidation territory, register the tokens involved to the resolver, and deploy the liquidator contract (in adjacent repo).
-# TODO: deploy a mock balancer for flash loans
+# Define the commands to be executed:
 commands = [
-            f'forge script DeployLiqContract.s.sol:DeployLiqContractScript --fork-url http://127.0.0.1:8545 -vvvvv --ffi --broadcast']
+            f'forge script DeployLiqContract.s.sol:DeployLiqContractScript --fork-url {FORK_URL} -vvvvv --ffi --broadcast']
 
 # pull deployment info into env
 read_json_to_envir('../../../itos-deploy/script/core/deployment/combined.json')
