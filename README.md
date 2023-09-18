@@ -1,4 +1,4 @@
-# Super Simple Event Listener
+# Minimal Sample Liquidator
 
 ## To run
 `python3 main.py <pm_address> <resolver_address> <liquidator_contract_address> -p 4321`
