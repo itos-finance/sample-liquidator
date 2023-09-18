@@ -17,6 +17,7 @@ contract DeployLiqContractScript is Script {
         //address weth = vm.envAddress("WETH");
         address router = 0x6822bFe69df8F2c857edd8b1f224Fb5805FbFBB6; //vm.envAddress("ROUTER");
         address factory = 0xb2f0D984330C3B3F947523bD919437A303Fa7f81;//vm.envAddress("FACTORY");
+
         vm.startBroadcast(deployerPrivateKey);
         Liquidator liq = new Liquidator(positionManagerAddr, balancerAddr, router, factory);
 
